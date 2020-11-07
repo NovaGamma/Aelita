@@ -6,6 +6,7 @@ from talk import Talk
 from datetime import datetime
 import enchant
 
+
 MutedVoice = []
 Muted = []
 client = discord.Client()
@@ -20,5 +21,9 @@ from Motus.motus import load_motus
 
 Motus = load_motus()
 
+Games = []
+Guild = None
+
 from Motus.motus import motus
 from command import Command
+from TheWolf.wolf import gameMessage,inGame,createGame

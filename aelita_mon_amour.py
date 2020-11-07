@@ -22,6 +22,8 @@ async def get_guilds():
 @client.event
 async def on_ready():
     talk.guilds = await get_guilds()
+    global Guild
+    Guild = talk.guilds[1]
     print("Hi Elvin i'm here")
 
 @client.event
@@ -50,6 +52,29 @@ async def on_message(message):
     if Message(message,'&'):
         await talk.connect(message)
         return
+
+    for game in Games:#part that will check if the received message belong to a message sent in a game to be treated by a dedicated function
+        if message.channel.category.id == game.gameCategory.id:
+            await gameMessage(message,game)
+
+    if message.content == ("Create Game") and message.channel.name == "games":
+        if not inGame(message.author):
+            await createGame(message,Guild)
+            await message.delete()
+        else:
+            await message.channel.send(message.author.mention + " You're already in a game, you can't create one",delete_after = 30)
+            await message.delete()
+        return
+
+    if message.content == "delete game":
+        if message.author.guild_permissions.administrator:
+            categoryId = message.channel.category_id
+            for category in Guild.categories:
+                if categoryId == category.id and "Game" in category.name:
+                    for channel in category.channels:
+                        await channel.delete()
+                    await category.delete()
+                    return
 
     if message.channel.guild.name in Motus.keys():
         await motus(message)
