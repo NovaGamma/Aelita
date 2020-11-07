@@ -54,7 +54,6 @@ async def on_message(message):
     if message.channel.guild.name in Motus.keys():
         await motus(message)
 
-
 @client.event
 async def on_reaction_add(reaction,user):
     if reaction.count == 1 and reaction.emoji == "‼️":
@@ -81,5 +80,6 @@ async def on_reaction_add(reaction,user):
 
 #id hugo = 530726932216807437
 #-------------------- ‼️
-
-client.run("NzcyNTA3ODM1MjI1MjEwOTAw.X57r_A.50E4BKDU_pLs21vsZwDlvO0iYT4")
+with open('id.txt','r') as IdFile:
+    id = IdFile.read()
+client.run(id)

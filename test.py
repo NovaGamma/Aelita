@@ -16,5 +16,19 @@ def check_word(given_word,word):#given_word=word word=Motus[name]['motus']['word
             state[i] = 0
     return state
 
+def convert(state,word):
+    good = 0
+    text = ''
+    for i in range(len(state)):
+        if state[i] == 0:
+            text += ':x:'
+        if state[i] == 1:
+            text += ':large_orange_diamond:'
+        if state[i] == 2:
+            good += 1
+            text += ':regional_indicator_' + word[i].lower() + ':'
+    return [text,good]
+
 a = check_word('EPEISTE','EPSTEIN')
-print(a)
+text = convert(a,'EPSTEIN')
+print(text)

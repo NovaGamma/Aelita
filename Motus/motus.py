@@ -35,13 +35,16 @@ def load_motus(guild='all'):
                             for line in MotusFile:
                                 temp=line.split(':')
                                 temp[1]=temp[1].rstrip('\n')
-                                Motus[guild_name]['motus'][temp[0]]=temp[1]
-                    if os.path.exists(guild_name + '/List.txt'):
-                        with open(guild_name + '/List.txt') as ListFile:
-                            Motus[guild_name]['list'] = []
-                            for line in ListFile:
-                                temp = line.rstrip('\n').split(':')
-                                Motus[guild_name]['list'].append([temp[0],temp[1]])
+                                if temp[1] == 'state':
+                                    Motus[guild_name]['motus']['state'] = temp[1].split(',')
+                                else:
+                                    Motus[guild_name]['motus'][temp[0]]=temp[1]
+                    #if os.path.exists(guild_name + '/List.txt'):
+                    #    with open(guild_name + '/List.txt') as ListFile:
+                    #        Motus[guild_name]['list'] = []
+                    #        for line in ListFile:
+                    #            temp = line.rstrip('\n').split(':')
+                    #            Motus[guild_name]['list'].append([temp[0],temp[1]])
         if guild=='all':
             return Motus
         else:
@@ -51,10 +54,14 @@ def load_motus(guild='all'):
 def save_motus(guild):
     with open(guild+'/Motus.txt','w+') as MotusFile:
         for key in Motus[guild]['motus'].keys():
-            MotusFile.write(key+':'+str(Motus[guild]['motus'][key])+'\n')
-    with open(guild+'/List.txt','w+') as ListFile:
-        for motus in Motus[guild]['list']:
-            ListFile.write(motus[0] + ":" + author + '\n')
+            if key == 'status':
+                a = ','
+                MotusFile.write(key + ':' + a.join(Motus[guild]['motus'][key]) + '\n')
+            else:
+                MotusFile.write(key + ':' + str(Motus[guild]['motus'][key]) + '\n')
+    #with open(guild+'/List.txt','w+') as ListFile:
+    #    for motus in Motus[guild]['list']:
+    #        ListFile.write(motus[0] + ":" + author + '\n')
 
 def check_word(given_word,word):#given_word=word word=Motus[name]['motus']['word']
     state = []#0=:x: 1=:large_orange_diamond: 2=:red_circle:
@@ -74,7 +81,7 @@ def check_word(given_word,word):#given_word=word word=Motus[name]['motus']['word
             state[i] = 0
     return state
 
-def convert(state):
+def convert(state,word):
     good = 0
     text = ''
     for i in range(len(state)):
@@ -84,8 +91,38 @@ def convert(state):
             text += ':large_orange_diamond:'
         if state[i] == 2:
             good += 1
-            text += ':red_circle:'
+            text += ':regional_indicator_' + word[i].lower() + ':'
     return [text,good]
+
+async def updateStatus(state,guild,message = None):
+    word = Motus[guild]['motus']['word']
+    change = False
+    if not('status' in Motus[guild]['motus'].keys()) or len(Motus[guild]['motus']['status']) != len(word):
+        Motus[guild]['motus']['status'] = []
+        for i in range(len(word)):
+            Motus[guild]['motus']['status'].append('0')
+    status = Motus[guild]['motus']['status']
+    for i in range(len(word)):
+        if status[i] == '0':
+            if state[i] == 2:
+                status[i] = '2'
+                change = True
+    if change:
+        save_motus(guild)
+        #time.sleep(2)
+        #await displayStatus(guild,message)
+    Motus[guild]['motus']['status'] = status
+
+async def displayStatus(guild,message):
+    text = ''
+    status = Motus[guild]['motus']['status']
+    word = Motus[guild]['motus']['word']
+    for i in range(len(status)):
+        if status[i] == '2':
+            text += ':regional_indicator_' + word[i].lower() + ':'
+        else:
+            text += ':x:'
+    await message.channel.send(text)
 
 async def motus(message):
     global Motus
@@ -127,14 +164,14 @@ async def motus(message):
                                 await m_temp.channel.send("```Le mot doit avoir une longueur comprise entre 5 lettres et 15 lettres```")
                         else:
                             await m_temp.channel.send("```Tu n'es pas le dernier vainqueur```")
-                    else:
-                        if len(word) >= 5 and len(word) <= 15:
-                            if len(Motus[name]['list']) == 0:
-                                Motus[name]['list'] = [[word,str(m_temp.author.id)]]
-                            else:
-                                Motus[name]['list'].append([word,str(m_temp.author.id)])
-                        else:
-                            await m_temp.channel.send("```Le mot doit avoir une longueur comprise entre 5 lettres et 15 lettres```")
+                    #else:
+                    #    if len(word) >= 5 and len(word) <= 15:
+                    #        if len(Motus[name]['list']) == 0:
+                    #            Motus[name]['list'] = [[word,str(m_temp.author.id)]]
+                    #        else:
+                    #            Motus[name]['list'].append([word,str(m_temp.author.id)])
+                        #else:
+                        #    await m_temp.channel.send("```Le mot doit avoir une longueur comprise entre 5 lettres et 15 lettres```")
                 else:
                     await m_temp.channel.send("```Ce mot n'existe pas ou n'est pas dans le dictionnaire```")
             else:
@@ -242,6 +279,11 @@ async def motus(message):
             await client.logout()
         return
 
+    elif message.content.startswith('$Mstatus'):
+        name = message.channel.guild.name
+        await displayStatus(name,message)
+        await message.delete()
+
     if message.channel.guild.name in Motus.keys():
         name=message.channel.guild.name
         if message.channel.id in Motus[name]['channels']:
@@ -253,20 +295,9 @@ async def motus(message):
                         if len(word)==len(Motus[name]['motus']['word']):
                             if word[0]==Motus[name]['motus']['word'][0]:
                                 if dico.check(word):
-                                    '''
-                                    text=''
-                                    good=0
-                                    for i in range(len(Motus[name]['motus']['word'])):
-                                        if word[i]==Motus[name]['motus']['word'][i]:
-                                            text+=':red_circle:'
-                                            good+=1
-                                        else:
-                                            if word[i] in Motus[name]['motus']['word']:
-                                                text+=':large_orange_diamond:'
-                                            else:
-                                                text+=':x:' '''
                                     state = check_word(word,Motus[name]['motus']['word'])
-                                    temp = convert(state)
+                                    await updateStatus(state,name,message = message)
+                                    temp = convert(state,word)
                                     good = temp[1]
                                     text = temp[0]
                                     await message.channel.send(text)
@@ -274,13 +305,14 @@ async def motus(message):
                                         await message.channel.send("Bravo,"+message.author.mention+"!")
                                         del Motus[name]['motus']['word']
                                         del Motus[name]['motus']['author']
+                                        del Motus[name]['motus']['status']
                                         Motus[name]['motus']['winner']=message.author.id
-                                        if len(Motus[name]['list']) > 0:
-                                            Motus[name]['motus']['word'] = Motus[name]['list'][0][0]
-                                            Motus[name]['motus']['author'] = Motus[name]['list'][0][1]
-                                            Motus[name]['list'].pop(0)
-                                            channel = guild.get_channel(Motus[name]['channels'][0])
-                                            await channel.send("```Le mot actuel contient "+str(len(Motus[channel.guild.name]['motus']['word']))+" lettres et commence par un "+str(Motus[channel.guild.name]['motus']['word'][0])+"```")
+                                        #if len(Motus[name]['list']) > 0:
+                                        #    Motus[name]['motus']['word'] = Motus[name]['list'][0][0]
+                                        #    Motus[name]['motus']['author'] = Motus[name]['list'][0][1]
+                                        #    Motus[name]['list'].pop(0)
+                                        #    channel = guild.get_channel(Motus[name]['channels'][0])
+                                        #    await channel.send("```Le mot actuel contient "+str(len(Motus[channel.guild.name]['motus']['word']))+" lettres et commence par un "+str(Motus[channel.guild.name]['motus']['word'][0])+"```")
                                         save_motus(name)
                                         Motus[name]=load_motus(name)
                                 else:
