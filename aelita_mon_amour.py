@@ -80,6 +80,6 @@ async def on_reaction_add(reaction,user):
 
 #id hugo = 530726932216807437
 #-------------------- ‼️
-with open('id.txt','r') as IdFile:
+with open('Id/id.txt','r') as IdFile:
     id = IdFile.read()
 client.run(id)
