@@ -11,8 +11,11 @@ MutedVoice = []
 Muted = []
 client = discord.Client()
 Elvin = 281432668196044800
-
+al = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
+mention = ['Oui ?','Oui ??','Stop','Vraiment Stop','STOP !!']
+count = 0
 talk = Talk(client)
+ctime = 0
 
 Motus = {}
 dico = enchant.Dict("fr_FR")

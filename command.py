@@ -30,6 +30,15 @@ async def Command(message):
                 await message.guild.create_custom_emoji(name = name.rstrip('.png'), image = image.read())
         return
 
+    elif Message(message,'$emoji'):
+        emojis = await message.guild.fetch_emojis()
+        temp = message.content.lstrip('$emoji ').split(':')
+        name = temp[1] if len(temp) > 1 else ''
+        for emoji in emojis:
+            if name == emoji.name:
+                await message.channel.send(emoji.url)
+                break
+
     elif Message(message,'$delete'):
         if Admin(message.author):
             if Message(message,'$delete bot'):
@@ -51,9 +60,6 @@ async def Command(message):
         else:
             await message.delete()
         return
-
-    elif Message(message,"$A"):
-        await message.channel.send(":regional_indicator_a:")
 
     elif Message(message,"$Flavien"):
         if message.author.id != 362644900535074816:
@@ -83,7 +89,7 @@ async def Command(message):
         if len(message.mentions) == 1 or len(message.mentions) == 2:
             mention = message.mentions
             for user in mention:
-                if user.channel != None and (user.id == 530726932216807437 or user.id == 362644900535074816):
+                if user.voicd != None and (user.id == 530726932216807437 or user.id == 362644900535074816):
                     await user.move_to([channel for channel in message.guild.voice_channels if channel.name == "Avis Biaisé"][0])
             await message.delete()
         return

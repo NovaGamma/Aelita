@@ -1,5 +1,4 @@
 from init import*
-
 from talk import*
 
 
@@ -25,11 +24,46 @@ async def on_ready():
     global Guild
     Guild = talk.guilds[1]
     print("Hi Elvin i'm here")
+    activity = discord.CustomActivity("AHHHHH")
+    await client.change_presence(activity = activity)
 
 @client.event
 async def on_message(message):
     if message.author == client.user:
         return
+
+    if len(message.mentions) > 0 and message.mentions[0] == client.user:
+        if message.content[0] == '<' and message.content[len(message.content)-1] == '>':
+            global count
+            global ctime
+            if count == 5:
+                count = 0
+            if count != 0:
+                factor = (time.time() - ctime)%10
+                if factor > count:
+                    count = 0
+                else:
+                    count -= factor
+            await message.channel.send("```" + mention[count] + "```")
+            count += 1
+            ctime = time.time()
+        elif len(message.content.lstrip('<@!772507835225210900>').split(' ')) == 2:
+            word = message.content.lstrip('<@!772507835225210900>').lstrip().split(' ')[0]
+            await message.channel.send('https://fr.wikipedia.org/wiki/' + word)
+
+    if len(message.content) == 1 and message.content in al:
+        index = al.index(message.content) + 1
+        if index != len(al):
+            character = al[index]
+            await message.channel.send('```' + character + '```')
+
+    if message.content.isdigit():
+        number = int(message.content)
+        text = "```" +str(number + 1) + "```"
+        if len(text) < 2000:
+            await message.channel.send("```" +str(number + 1) + "```")
+        else:
+            await message.channel.send("```Tu es trop gourmand```")
 
     if message.author in Muted and not(message.channel.name == "diplomatie" or message.channel.name == "musique") and not(message.author.id == 281432668196044800):
         await message.delete()
