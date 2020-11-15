@@ -298,7 +298,7 @@ async def motus(message):
                                             if 'word' in Motus[name]['motus'].keys():
                                                 return
                                             time.sleep(10)
-                                        await channel.send("```Aucun mot n'a été donner par le gagant au bout de 10 minutes, Motus a été réinitialisé, n'importe qui peux donc donner un mot```")
+                                        await channel.send("```Aucun mot n'a été donner par le gagnant au bout de 10 minutes, Motus a été réinitialisé, n'importe qui peux donc donner un mot```")
                                         Motus[name]['motus']['winner'] = -1
                                         save_motus(name)
                                         Motus[name]=load_motus(name)
