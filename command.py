@@ -116,6 +116,12 @@ async def Command(message):
             await message.channel.send(file = discord.File(path))
             os.remove(path)
 
+    elif Message(message,'$calc'):
+        content = message.content.lstrip('$calc ')
+        converted = convert(content)
+        result = math(converted)
+        await message.channel.send("```"+result+"```")
+
     elif Message(message,'$delete'):
         if Admin(message.author):
             if Message(message,'$delete bot'):

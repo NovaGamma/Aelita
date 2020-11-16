@@ -6,6 +6,7 @@ from talk import Talk
 from datetime import datetime
 import enchant
 from PIL import Image, ImageDraw, ImageFont
+from strMath import*
 
 MutedVoice = []
 Muted = []
