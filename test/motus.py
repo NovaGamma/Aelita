@@ -33,9 +33,12 @@ def load_motus(guild='all'):
 	return {}
 
 def save_motus(guild):
-	with open(guild+'/Motus.txt','w+') as MotusFile:
+	print('before')
+	with open(guild + '/Motus.txt','w+') as MotusFile:
+		print(Motus)
 		for key in Motus[guild]['motus'].keys():
-			MotusFile.write(key+':'+str(Motus[guild]['motus'][key])+'\n')
+			MotusFile.write(key + ':' + str(Motus[guild]['motus'][key]) + '\n')
+			print(key + ':' + str(Motus[guild]['motus'][key]) + '\n')
 
 def check_word(given_word,word):#given_word=word word=Motus[name]['motus']['word']
     state = []#0=:x: 1=:large_orange_diamond: 2=:red_circle:
@@ -227,30 +230,23 @@ async def motus(message):
 						if len(word)==len(Motus[name]['motus']['word']):
 							if word[0]==Motus[name]['motus']['word'][0]:
 								if dico.check(word):
-									'''
-									text=''
-									good=0
-									for i in range(len(Motus[name]['motus']['word'])):
-										if word[i]==Motus[name]['motus']['word'][i]:
-											text+=':red_circle:'
-											good+=1
-										else:
-											if word[i] in Motus[name]['motus']['word']:
-												text+=':large_orange_diamond:'
-											else:
-												text+=':x:' '''
 									state = check_word(word,Motus[name]['motus']['word'])
 									temp = convert(state)
 									good = temp[1]
 									text = temp[0]
 									await message.channel.send(text)
 									if good==len(Motus[name]['motus']['word']):
-										await message.channel.send("Bravo,"+message.author.mention+"!")
+										await message.channel.send('before message')
+										await message.channel.send("Bravo," + message.author.mention+"!")
+										await message.channel.send('before del 1')
 										del Motus[name]['motus']['word']
+										await message.channel.send('before del 2')
 										del Motus[name]['motus']['author']
-										Motus[name]['motus']['winner']=message.author.id
+										await message.channel.send("before author id")
+										Motus[name]['motus']['winner'] = message.author.id
+										await message.channel.send("before save")
 										save_motus(name)
-										Motus[name]=load_motus(name)
+										Motus[name] = load_motus(name)
 								else:
 									await message.delete(delay=20)
 									await message.channel.send("```Ce mot n'existe pas```",delete_after=20)

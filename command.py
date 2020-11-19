@@ -120,10 +120,13 @@ async def Command(message):
         content = message.content.lstrip('$calc ')
         converted = convert(content)
         result = math(converted)
-        await message.channel.send("```"+result+"```")
+        if len(result) > (2000-6):
+            await message.channel.send("```The result is too long to be displayed```")
+        else:
+            await message.channel.send("```"+result+"```")
 
     elif Message(message,'$delete'):
-        if Admin(message.author):
+        if Admin(message.author) or message.author.id == Elvin:
             if Message(message,'$delete bot'):
                 temp=message.content.split(' ')
                 if temp[2].isdigit():

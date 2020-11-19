@@ -59,9 +59,12 @@ async def on_message(message):
 
     if message.content.isdigit():
         number = int(message.content)
-        text = "```" +str(number + 1) + "```"
+        if number == 69:
+            text = "```Nice !```"
+        else:
+            text = "```" +str(number + 1) + "```"
         if len(text) < 2000:
-            await message.channel.send("```" +str(number + 1) + "```")
+            await message.channel.send(text)
         else:
             await message.channel.send("```Tu es trop gourmand```")
 

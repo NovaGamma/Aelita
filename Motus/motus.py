@@ -242,13 +242,27 @@ async def motus(message):
         return
 
     elif message.content=='$Mpasse':
-        if message.author.guild_permissions.administrator:
+        if message.author.guild_permissions.administrator or message.author.id == 281432668196044800:
             name = message.channel.guild.name
             if not('word' in Motus[name]['motus'].keys()):
+                await message.channel.send("```L'ancien vainqueur a été enlevé, n'importe qui peut mettre un mot```")
                 Motus[name]['motus']['winner'] = -1
                 save_motus(name)
                 Motus[name]=load_motus(name)
         return
+
+    elif message.content == '$Mskip':
+        if message.author.guild_permissions.administrator or message.author.id == Elvin:
+            await message.channel.send("```Le mot a été passé, n'importe qui peut en remettre un```")
+            del Motus[name]['motus']['word']
+            del Motus[name]['motus']['author']
+            del Motus[name]['motus']['status']
+            Motus[name]['motus']['winner'] = -1
+            save_motus(name)
+            Motus[name]=load_motus(name)
+        else:
+            await message.channel.send("```Tu n'as pas les permissions pour passer le mot```",delete_after = 20)
+            await message.delete()
 
     elif message.content=='$Mot':
         if 'word' in Motus[message.channel.guild.name]['motus'].keys():
@@ -294,14 +308,14 @@ async def motus(message):
                                         save_motus(name)
                                         Motus[name]=load_motus(name)
                                         channel = message.channel
-                                        for i in range(60):
+                                        '''for i in range(60):
                                             if 'word' in Motus[name]['motus'].keys():
                                                 return
                                             time.sleep(10)
                                         await channel.send("```Aucun mot n'a été donner par le gagnant au bout de 10 minutes, Motus a été réinitialisé, n'importe qui peux donc donner un mot```")
                                         Motus[name]['motus']['winner'] = -1
                                         save_motus(name)
-                                        Motus[name]=load_motus(name)
+                                        Motus[name]=load_motus(name)'''
                                 else:
                                     await message.delete(delay=20)
                                     await message.channel.send("```Ce mot n'existe pas```",delete_after=20)
