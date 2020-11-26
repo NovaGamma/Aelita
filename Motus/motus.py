@@ -113,175 +113,175 @@ async def displayStatus(guild,message):
             text += ':x:'
     await message.channel.send(text)
 
-
 async def motus(message):
     global Motus
 
-@bot.command(name = 'Motus')
-async def fMotus(ctx,*args):
-    m_temp=message
-    temp=args
-    if len(temp) == 2:
-        try:
-            ID = int(temp[1])
-        except:
-            await ctx.send("```Tu dois d'abord donner l'id du serveur```")
-            return
-        word = temp[2]
-        if os.path.exists("Guilds.txt"):
-            with open("Guilds.txt",'r') as GuildFile:
-                for line in GuildFile:
-                    temp_guild = line.split(':')
-                    if int(temp_guild[1]) == ID:
-                        name = temp_guild[0]
-        else:
-            await ctx.send("```Motus n'a pas encore été activé```")
-            return
-    if len(temp) == 2:
-        if word.isupper() and word.isalpha():
-            if dico.check(word):
-                if not('word' in Motus[name]['motus'].keys()):
-                    if ('winner' in Motus[name]['motus'].keys() and (Motus[name]['motus']['winner'] == str(ctx.author.id) or Motus[name]['motus']['winner'] == '-1')):
-                        if len(word)>=5 and len(word)<=15:
-                            Motus[name]['motus']['word'] = word
-                            Motus[name]['motus']['author'] = str(cxt.author.id)
-                            save_motus(name)
-                            for guild in await get_guilds():
-                                if guild.name == name:
-                                    channel = guild.get_channel(Motus[name]['channels'][0])
-                                    await channel.send("```Le mot actuel contient "+str(len(Motus[channel.guild.name]['motus']['word']))+" lettres et commence par un "+str(Motus[channel.guild.name]['motus']['word'][0])+"```")
-                            await ctx.send("```Ton mot est enregistré```")
-                        else:
-                            await ctx.send("```Le mot doit avoir une longueur comprise entre 5 lettres et 15 lettres```")
-                    else:
-                        await ctx.send("```Tu n'es pas le dernier vainqueur```")
-            else:
-                await ctx.send("```Ce mot n'existe pas ou n'est pas dans le dictionnaire```")
-        else:
-            await ctx.send("```Tu dois donner le mot en majuscules```")
-    else:
-        await ctx.send("```Tu ne dois donner que des lettres```")
-    return
-
-@bot.command()
-async def Mrecharge(ctx):
-    if ctx.author.id==281432668196044800:
-        await ctx.send("```Rechargé```")
-        Motus = {}
-        Motus = load_motus()
-
-@bot.command()
-async def Msupprime(ctx):
-    if ctx.author.id==281432668196044800:
-        with open("Motus.txt",'w+') as MotusFile:
-            MotusFile.write('')
-        await ctx.send("```Supprimé```")
-
-@bot.command()
-async def Mliste(ctx):
-    if os.path.exists('Guilds.txt'):
-        with open('Guilds.txt','r') as GuildFile:
-            text='```'
-            nServer=0
-            for line in GuildFile:
-                nServer+=1
-                temp=line.split(':')
-                text+='Nom : '+temp[0]+'   Id : '+temp[1]
-            if nServer==1:
-                t=' Serveur trouvé\n'
-            else:
-                t=' Serveurs trouvés\n'
-            await ctx.send(str(nServer)+t+text)
-    else:
-        await ctx.send("```Aucun serveur enregistré```")
-
-@bot.command()
-async def Maide(ctx):
-    await ctx.send("```$Mactiver : pour que les administrateurs activent Motus dans un canal \n\n$Passe : pour que les administrateurs sautent un mot s'il est trop compliqué \n\n$Mot : pour voir quels sont les conseils du mot actuel \n\n$Mchannel : pour voir dans quels canaux Motus a été activé \n\n$Mid : pour obtenir l'identifiant du serveur  \n\n$Motus : à faire en message privé au bot pour donner le mot à trouver, ne fonctionne que si Motus vient d'être activé ou si voustrouvez le dernier mot```")
-    return
-
-@bot.command()
-async def Mid(ctx):
-    if ctx.guild.name in Motus.keys():
-        await ctx.send("```L'id du serveur est : "+str(ctx.guild.id)+"```")
-    else:
-        await ctx.send("```Motus n'a pas encore été activé sur ce serveur```")
-    return
-
-@bot.command()
-async def Mactiver(ctx):
-    if ctx.author.guild_permissions.administrator:
-        iD=ctx.message.channel.id
-        guild=ctx.guild
-        with open("Guilds.txt",'a+') as GuildFile:
-            already=0
-            text=guild.name+':'+str(guild.id)+'\n'
-            for line in GuildFile:
-                if line==text:
-                    already=1
-            if already==0:
-                GuildFile.write(guild.name+':'+str(guild.id)+'\n')
-        if not(os.path.exists(guild.name)):
-            os.mkdir(str(guild.name))
-        with open(str(guild.name)+'/channel.txt','a+') as ChannelFile:
-            exist=0
-            for line in ChannelFile:
-                line_channel=int(line)
-                if line_channel==iD:
-                    exist=1
-            if not(exist):
-                ChannelFile.write(str(iD)+'\n')
-                await ctx.send("```Motus a été activé correctement```")
-            else:
-                await ctx.send("```Motus est déjà activé sur ce channel```")
+    if message.content.startswith('$Motus'):
+        m_temp=message
+        temp=m_temp.content.split(' ')
+        if len(temp) == 3:
+            try:
+                ID = int(temp[1])
+            except:
+                await message.channel.send("```Tu dois d'abord donner l'id du serveur```")
                 return
-        with open(str(guild.name)+'/Motus.txt','a+') as MotusFile:#used to create the motus.txt file used to avoid bugs after
-            pass
-        Motus[guild.name]=load_motus(guild.name)
-    else:
-        await ctx.send("```Tu n'as pas la permission pour cette commande```",delete_after=20)
-    return
+            word = temp[2]
+            if os.path.exists("Guilds.txt"):
+                with open("Guilds.txt",'r') as GuildFile:
+                    for line in GuildFile:
+                        temp_guild = line.split(':')
+                        if int(temp_guild[1]) == ID:
+                            name = temp_guild[0]
+            else:
+                await message.channel.send("```Motus n'a pas encore été activé```")
+                return
+        if len(temp) == 3:
+            if word.isupper() and word.isalpha():
+                if dico.check(word):
+                    if not('word' in Motus[name]['motus'].keys()):
+                        if ('winner' in Motus[name]['motus'].keys() and (Motus[name]['motus']['winner'] == str(m_temp.author.id) or Motus[name]['motus']['winner'] == '-1')):
+                            if len(word)>=5 and len(word)<=15:
+                                Motus[name]['motus']['word'] = word
+                                Motus[name]['motus']['author'] = str(m_temp.author.id)
+                                save_motus(name)
+                                for guild in await get_guilds():
+                                    if guild.name == name:
+                                        channel = guild.get_channel(Motus[name]['channels'][0])
+                                        await channel.send("```Le mot actuel contient "+str(len(Motus[channel.guild.name]['motus']['word']))+" lettres et commence par un "+str(Motus[channel.guild.name]['motus']['word'][0])+"```")
+                                await m_temp.channel.send("```Ton mot est enregistré```")
+                            else:
+                                await m_temp.channel.send("```Le mot doit avoir une longueur comprise entre 5 lettres et 15 lettres```")
+                        else:
+                            await m_temp.channel.send("```Tu n'es pas le dernier vainqueur```")
+                else:
+                    await m_temp.channel.send("```Ce mot n'existe pas ou n'est pas dans le dictionnaire```")
+            else:
+                await m_temp.channel.send("```Tu dois donner le mot en majuscules```")
+        else:
+            await m_temp.channel.send("```Tu ne dois donner que des lettres```")
+        return
 
-@bot.command()
-async def Mpasse(ctx):
-    if ctx.author.guild_permissions.administrator or ctx.author.id == 281432668196044800:
-        name = ctx.guild.name
-        if not('word' in Motus[name]['motus'].keys()):
-            await ctx.send("```L'ancien vainqueur a été enlevé, n'importe qui peut mettre un mot```")
+
+    elif message.content=='$Mrecharge':
+        if message.author.id==281432668196044800:
+            await message.channel.send("```Rechargé```")
+            Motus = {}
+            Motus = load_motus()
+
+    elif message.content=='$Msupprime':
+        if message.author.id==281432668196044800:
+            with open("Motus.txt",'w+') as MotusFile:
+                MotusFile.write('')
+            await message.channel.send("```Supprimé```")
+
+    elif message.content=='$Mliste':
+        if os.path.exists('Guilds.txt'):
+            with open('Guilds.txt','r') as GuildFile:
+                text='```'
+                nServer=0
+                for line in GuildFile:
+                    nServer+=1
+                    temp=line.split(':')
+                    text+='Nom : '+temp[0]+'   Id : '+temp[1]
+                if nServer==1:
+                    t=' Serveur trouvé\n'
+                else:
+                    t=' Serveurs trouvés\n'
+                await message.channel.send(str(nServer)+t+text)
+        else:
+            await message.channel.send("```Aucun serveur enregistré```")
+#----------------------------------------------------------------------------------------------------------------------------------
+    try:
+        message.channel.name
+    except:
+        print("exit")
+        return
+#----------------------------------------------------------------------------------------------------------------------------------
+    if message.content=='$Maide':
+        await message.channel.send("```$Mactiver : pour que les administrateurs activent Motus dans un canal \n\n$Passe : pour que les administrateurs sautent un mot s'il est trop compliqué \n\n$Mot : pour voir quels sont les conseils du mot actuel \n\n$Mchannel : pour voir dans quels canaux Motus a été activé \n\n$Mid : pour obtenir l'identifiant du serveur  \n\n$Motus : à faire en message privé au bot pour donner le mot à trouver, ne fonctionne que si Motus vient d'être activé ou si vous trouvez le dernier mot```")
+        return
+
+    elif message.content=='$Mid':
+        if message.channel.guild.name in Motus.keys():
+            await message.channel.send("```L'id du serveur est : "+str(message.channel.guild.id)+"```")
+        else:
+            await message.channel.send("```Motus n'a pas encore été activé sur ce serveur```")
+        return
+
+    elif message.content=='$Mactiver':
+        if message.author.guild_permissions.administrator:
+            iD=message.channel.id
+            guild=message.channel.guild
+            with open("Guilds.txt",'a+') as GuildFile:
+                already=0
+                text=guild.name+':'+str(guild.id)+'\n'
+                for line in GuildFile:
+                    if line==text:
+                        already=1
+                if already==0:
+                    GuildFile.write(guild.name+':'+str(guild.id)+'\n')
+            if not(os.path.exists(guild.name)):
+                os.mkdir(str(guild.name))
+            with open(str(guild.name)+'/channel.txt','a+') as ChannelFile:
+                exist=0
+                for line in ChannelFile:
+                    line_channel=int(line)
+                    if line_channel==iD:
+                        exist=1
+                if not(exist):
+                    ChannelFile.write(str(iD)+'\n')
+                    await message.channel.send("```Motus a été activé correctement```")
+                else:
+                    await message.channel.send("```Motus est déjà activé sur ce channel```")
+                    return
+            with open(str(guild.name)+'/Motus.txt','a+') as MotusFile:#used to create the motus.txt file used to avoid bugs after
+                pass
+            Motus[guild.name]=load_motus(guild.name)
+        else:
+            await message.channel.send("```Tu n'as pas la permission pour cette commande```",delete_after=20)
+        return
+
+    elif message.content=='$Mpasse':
+        if message.author.guild_permissions.administrator or message.author.id == 281432668196044800:
+            name = message.channel.guild.name
+            if not('word' in Motus[name]['motus'].keys()):
+                await message.channel.send("```L'ancien vainqueur a été enlevé, n'importe qui peut mettre un mot```")
+                Motus[name]['motus']['winner'] = -1
+                save_motus(name)
+                Motus[name]=load_motus(name)
+        return
+
+    elif message.content == '$Mskip':
+        if message.author.guild_permissions.administrator or message.author.id == Elvin:
+            await message.channel.send("```Le mot a été passé, n'importe qui peut en remettre un```")
+            del Motus[name]['motus']['word']
+            del Motus[name]['motus']['author']
+            del Motus[name]['motus']['status']
             Motus[name]['motus']['winner'] = -1
             save_motus(name)
             Motus[name]=load_motus(name)
-    return
+        else:
+            await message.channel.send("```Tu n'as pas les permissions pour passer le mot```",delete_after = 20)
+            await message.delete()
 
-@bot.command()
-async def Mskip(ctx):
-    if ctx.author.guild_permissions.administrator or ctx.author.id == Elvin:
-        await ctx.send("```Le mot a été passé, n'importe qui peut en remettre un```")
-        del Motus[name]['motus']['word']
-        del Motus[name]['motus']['author']
-        del Motus[name]['motus']['status']
-        Motus[name]['motus']['winner'] = -1
-        save_motus(name)
-        Motus[name]=load_motus(name)
-    else:
-        await ctx.send("```Tu n'as pas les permissions pour passer le mot```",delete_after = 20)
-        await ctx.message.delete()
+    elif message.content=='$Mot':
+        if 'word' in Motus[message.channel.guild.name]['motus'].keys():
+            await message.channel.send("```Le mot actuel contient "+str(len(Motus[message.channel.guild.name]['motus']['word']))+" lettres et commence par un "+str(Motus[message.channel.guild.name]['motus']['word'][0])+"```")
+        else:
+            await message.channel.send("```Il n'y a pas de mot actuellement```")
+        return
 
-@bot.command()
-async def Mot(ctx):
-    if 'word' in Motus[ctx.guild.name]['motus'].keys():
-        await ctx.send("```Le mot actuel contient "+str(len(Motus[ctx.guild.name]['motus']['word']))+" lettres et commence par un "+str(Motus[ctx.guild.name]['motus']['word'][0])+"```")
-    else:
-        await ctx.send("```Il n'y a pas de mot actuellement```")
-    return
+    elif message.content.startswith('$quit'):
+        if message.author.guild_permissions.administrator:
+            await message.channel.send('Déconnection...')
+            await client.logout()
+        return
 
-@bot.command()
-async def Mstatus(ctx):
-    name = ctx.guild.name
-    await displayStatus(name,ctx.message)
-    await ctx.message.delete()
+    elif message.content.startswith('$Mstatus'):
+        name = message.channel.guild.name
+        await displayStatus(name,message)
+        await message.delete()
 
-async def motus(message):
     if message.channel.guild.name in Motus.keys():
         name=message.channel.guild.name
         if message.channel.id in Motus[name]['channels']:

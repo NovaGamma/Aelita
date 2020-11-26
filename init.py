@@ -1,5 +1,4 @@
 import discord
-from discord.ext import commands
 import os
 import random
 import time
@@ -9,21 +8,19 @@ import enchant
 from PIL import Image, ImageDraw, ImageFont
 from strMath import*
 
-BOT_PREFIX = '$'
-bot = commands.Bot(command_prefix=(BOT_PREFIX,'&'))
 MutedVoice = []
 Muted = []
+client = discord.Client()
 Elvin = 281432668196044800
 al = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
 mention = ['Oui ?','Oui ??','Stop','Vraiment Stop','STOP !!']
 count = 0
-talk = Talk(bot)
+talk = Talk(client)
 ctime = 0
 
 Motus = {}
 dico = enchant.Dict("fr_FR")
 
-from command import*
 from Motus.motus import load_motus
 
 Motus = load_motus()
@@ -32,3 +29,5 @@ Games = []
 Guild = None
 
 from Motus.motus import motus
+from command import Command
+from TheWolf.wolf import gameMessage,inGame,createGame

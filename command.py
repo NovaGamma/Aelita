@@ -46,202 +46,189 @@ async def get_guilds():
             Stock = client.get_guild(guild.id)
     return [Putin,Muffin,Stock]
 
+def Message(message,text):
+    return True if message.content.startswith(text) else False
 
 def Admin(author):
     return author.guild_permissions.administrator
 
-@bot.command()
-async def hello(ctx):
-    await ctx.send('Hello')
-
-@bot.command()
-async def get_emoji(ctx):
-    if ctx.author.id == Elvin:
-        emojis = await ctx.guild.fetch_emojis()
+async def Command(message):
+    if Message(message,'$get_emoji') and message.author.id == Elvin:
+        emojis = await message.guild.fetch_emojis()
         urls = [[emoji.url,emoji.name] for emoji in emojis]
         for url in urls:
             await url[0].save('Emoji/' + url[1] + '.png')
         return
 
-@bot.command()
-async def save_emoji(ctx):
-    if ctx.author.id == Elvin:
+    elif Message(message,'$save_emoji') and message.author.id == Elvin:
         for name in os.listdir("Emoji/"):
             with open("Emoji/" + name,'rb') as image:
-                await ctx.guild.create_custom_emoji(name = name.rstrip('.png'), image = image.read())
+                await message.guild.create_custom_emoji(name = name.rstrip('.png'), image = image.read())
         return
 
-@bot.command()
-async def emoji(ctx,Name):
-    emojis = await message.guild.fetch_emojis()
-    temp = Name.split(':')
-    name = temp[1] if len(temp) > 1 else ''
-    for emoji in emojis:
-        if name == emoji.name:
-            await ctx.send(emoji.url)
-            break
+    elif Message(message,'$emoji'):
+        emojis = await message.guild.fetch_emojis()
+        temp = message.content.lstrip('$emoji ').split(':')
+        name = temp[1] if len(temp) > 1 else ''
+        for emoji in emojis:
+            if name == emoji.name:
+                await message.channel.send(emoji.url)
+                break
 
-@bot.command()
-async def meme(ctx,top='',middle='',bottom=''):
-    if len(ctx.message.attachments) == 1:
-        async with ctx.message.channel.typing():
-            attachment = ctx.message.attachments[0]
-            await attachment.save('Temp/'+attachment.filename)
-            im = Image.open('Temp/'+attachment.filename)
-            draw(im,top,middle,bottom)
-            im.save('Temp/'+attachment.filename)
-            with open('Temp/'+attachment.filename,'rb') as file:
-                await ctx.send(file = discord.File(file))
-            os.remove('Temp/'+attachment.filename)
-    await ctx.message.delete()
+    elif Message(message,'$meme'):
+        if len(message.attachments) == 1:
+            async with message.channel.typing():
+                attachment = message.attachments[0]
+                await attachment.save('Temp/'+attachment.filename)
+                temp = message.content.lstrip('$meme ').split(':')
+                top = temp[0]
+                middle = temp[1]
+                bottom = temp[2]
+                im = Image.open('Temp/'+attachment.filename)
+                draw(im,top,middle,bottom)
+                im.save('Temp/'+attachment.filename)
+                with open('Temp/'+attachment.filename,'rb') as file:
+                    await message.channel.send(file = discord.File(file))
+                os.remove('Temp/'+attachment.filename)
+        await message.delete()
 
-@bot.command()
-async def bigemoji(ctx,Name):
-    emojis = await ctx.guild.fetch_emojis()
-    content = Name.lstrip('<')
-    name = content.split(':')[1]
-    factor = float(content.split('>')[1].strip()) if content.split('>')[1] != '' else 2
-    if factor > 5:
-        await ctx.message.delete()
-        await ctx.send("```Le facteur max est 5 (c'est pour toi seb)```")
-        return
-    for emoji in emojis:
-        if name == emoji.name:
-            url = emoji.url
-            break
-    async with ctx.typing():
-        await url.save('Temp/' + emoji.name + '.png')
-        path = 'Temp/' + emoji.name + '.png'
-        im = Image.open(path)
-        size = (int(im.width * factor),int(im.height * factor))
-        new = im.resize(size)
-        new.save(path)
-        await ctx.send(file = discord.File(path))
-        os.remove(path)
-
-@bot.command()
-async def calc(ctx):
-    content = ctx.message.content[5:].lstrip()
-    if len(content) > 0:
-        converted = convert(content)
-        result = str(math(converted))
-        if len(result) > (2000-6):
-            await ctx.send("```The result is too long to be displayed```")
-        else:
-            await ctx.send("```"+result+"```")
-    else:
-        await ctx.send("```Vous n'avez rien donné a calculer```")
-
-async def dele(message):
-    await message.delete()
-
-@bot.command()
-async def delete(ctx,*args):
-    if Admin(ctx.author) or ctx.author.id == Elvin:
-        if len(args) > 1 and args[0] == 'bot':
-            if args[1].isdigit():
-                number=int(args[1])
-                messages = await ctx.message.channel.history(limit=number+1).flatten()
-                for m in messages:
-                    if m.author==bot.user:
-                        await m.delete()
+    elif Message(message,'$bigemoji'):
+        emojis = await message.guild.fetch_emojis()
+        temp = message.content.lstrip('$bigemoji <').split(':')
+        content = message.content.lstrip('$bigemoji <')
+        name = content.split(':')[1]
+        factor = float(content.split('>')[1].strip()) if content.split('>')[1] != '' else 2
+        if factor > 5:
             await message.delete()
+            await message.channel.send("```Le facteur max est 5 (c'est pour toi seb)```")
+            return
+        for emoji in emojis:
+            if name == emoji.name:
+                url = emoji.url
+                break
+        async with message.channel.typing():
+            await url.save('Temp/' + emoji.name + '.png')
+            path = 'Temp/' + emoji.name + '.png'
+            im = Image.open(path)
+            size = (int(im.width * factor),int(im.height * factor))
+            new = im.resize(size)
+            new.save(path)
+            await message.channel.send(file = discord.File(path))
+            os.remove(path)
+
+    elif Message(message,'$calc'):
+        content = message.content[5:].lstrip()
+        print(content)
+        if len(content) > 0:
+            converted = convert(content)
+            result = str(math(converted))
+            if len(result) > (2000-6):
+                await message.channel.send("```The result is too long to be displayed```")
+            else:
+                await message.channel.send("```"+result+"```")
         else:
-            if args[0].isdigit():
-                number=int(args[0])
-                messages = await ctx.message.channel.history(limit=number+1).flatten()
-                for m in messages:
-                    await m.delete()
-    else:
-        await ctx.message.delete()
-    return
+            await message.channel.send("```Vous n'avez rien donné a calculer```")
 
-@bot.command()
-async def Flavien(ctx):
-    if ctx.author.id != 362644900535074816:
-        await ctx.send("``` Cher Flavien,\n rapelle toi que tu n'auras jamais de pouvoir sur ce serveur\n Avec les compliments de la direction  ```")
-
-@bot.command()
-async def id(ctx):
-    if ctx.author.id == Elvin:
-        if len(ctx.message.channel_mentions) == 1:
-            channel = ctx.message.channel_mentions[0]
-            print(channel.id)
-        elif len(ctx.message.mentions) == 1:
-            user = ctx.message.mentions[0]
-            print(user.name + ' id ' + str(user.id))
-    return
-
-@bot.command()
-async def bdm(ctx):
-    if len(ctx.message.mentions) == 1 or len(ctx.message.mentions) == 2:
-        mention = ctx.message.mentions
-        for user in mention:
-            if user.voice != None:
-                await user.move_to([channel for channel in ctx.guild.voice_channels if channel.name == "A fait une blague de merde" or channel.name == "blague de merde"][0])
-        await ctx.message.delete()
-    return
-
-@bot.command()
-async def avis(ctx):
-    if len(ctx.message.mentions) == 1 or len(ctx.message.mentions) == 2:
-        mention = ctx.message.mentions
-        for user in mention:
-            if user.voice != None and (user.id == 530726932216807437 or user.id == 362644900535074816):
-                await user.move_to([channel for channel in ctx.guild.voice_channels if channel.name == "Avis Biaisé"][0])
-        await ctx.message.delete()
-    return
-
-@bot.command()
-async def embed(ctx):
-    embed = discord.Embed(description = "test Embed", color = 0x0e15d8)
-    await ctx.send(embed = embed)
-
-@bot.command()
-async def mute(ctx):
-    if Admin(ctx.author) and not(ctx.message.channel.id == 772515947503943690):
-        to_mute = ctx.message.mentions
-        if "$mutevoice" in ctx.message.content:
-            for m in to_mute:
-                if m.voice != None:
-                    await m.edit(mute = True)
-                    MutedVoice.append(m)
+    elif Message(message,'$delete'):
+        if Admin(message.author) or message.author.id == Elvin:
+            if Message(message,'$delete bot'):
+                temp=message.content.split(' ')
+                if temp[2].isdigit():
+                    number=int(temp[2])
+                    messages = await message.channel.history(limit=number+1).flatten()
+                    for m in messages:
+                        if m.author==client.user:
+                            await m.delete()
+                await message.delete()
+            else:
+                temp=message.content.split(' ')
+                if temp[1].isdigit():
+                    number=int(temp[1])
+                    messages = await message.channel.history(limit=number+1).flatten()
+                    for m in messages:
+                        await m.delete()
         else:
-            for m in to_mute:
-                Muted.append(m)
-        await ctx.message.delete()
-    return
+            await message.delete()
+        return
 
-@bot.command()
-async def unmute(ctx):
-    if Admin(ctx.author) and not(ctx.message.channel.id == 772515947503943690):
-        to_mute = ctx.message.mentions
-        if "$unmutevoice" in ctx.message.content:
-            for m in to_mute:
-                if m in MutedVoice and m.voice != None:
-                    await m.edit(mute = False)
-                    MutedVoice.remove(m)
+    elif Message(message,"$Flavien"):
+        if message.author.id != 362644900535074816:
+            await message.channel.send("``` Cher Flavien,\n rapelle toi que tu n'auras jamais de pouvoir sur ce serveur\n Avec les compliments de la direction  ```")
+            #await message.channel.send("```   ```")
+
+    elif Message(message,"$id"):
+        if message.author.id == 281432668196044800:
+            if len(message.channel_mentions) == 1:
+                channel = message.channel_mentions[0]
+                print(channel.id)
+            elif len(message.mentions) == 1:
+                user = message.mentions[0]
+                print(user.name + ' id ' + str(user.id))
+        return
+
+    elif Message(message,"$bdm"):
+        if len(message.mentions) == 1 or len(message.mentions) == 2:
+            mention = message.mentions
+            for user in mention:
+                if user.voice != None:
+                    await user.move_to([channel for channel in message.guild.voice_channels if channel.name == "A fait une blague de merde" or channel.name == "blague de merde"][0])
+            await message.delete()
+        return
+
+    elif Message(message,"$avis"):
+        if len(message.mentions) == 1 or len(message.mentions) == 2:
+            mention = message.mentions
+            for user in mention:
+                if user.voice != None and (user.id == 530726932216807437 or user.id == 362644900535074816):
+                    await user.move_to([channel for channel in message.guild.voice_channels if channel.name == "Avis Biaisé"][0])
+            await message.delete()
+        return
+
+    elif Message(message,"$embed"):
+        embed = discord.Embed(description = "test Embed", color = 0x0e15d8)
+        await message.channel.send(embed = embed)
+
+    elif Message(message,'$mute'):
+        if Admin(message.author) and not(message.channel.id == 772515947503943690):
+            to_mute = message.mentions
+            if "$mutevoice" in message.content:
+                for m in to_mute:
+                    if m.voice != None:
+                        await m.edit(mute = True)
+                        MutedVoice.append(m)
+            else:
+                for m in to_mute:
+                    Muted.append(m)
+            await message.delete()
+        return
+
+    elif Message(message,'$unmute'):
+        if Admin(message.author) and not(message.channel.id == 772515947503943690):
+            to_mute = message.mentions
+            if "$unmutevoice" in message.content:
+                for m in to_mute:
+                    if m in MutedVoice and m.voice != None:
+                        await m.edit(mute = False)
+                        MutedVoice.remove(m)
+            else:
+                for m in to_mute:
+                    if m in MutedVoice:
+                        Muted.remove(m)
+            await message.delete()
+        return
+
+    elif Message(message,'$list'):
+        if len(Muted) == 0:
+            embed = discord.Embed(description = "No one is mute !", color = 0x0e15d8)
+            await message.channel.send(embed = embed)
         else:
-            for m in to_mute:
-                if m in MutedVoice:
-                    Muted.remove(m)
-        await ctx.message.delete()
-    return
+            list = [user.mention for user in Muted]
+            text = ''
+            for mention in list:
+                text += mention
+            embed = discord.Embed(description = text, color = 0x0e15d8)
+            await message.channel.send(embed = embed)
 
-@bot.command()
-async def list(ctx):
-    if len(Muted) == 0:
-        embed = discord.Embed(description = "No one is mute !", color = 0x0e15d8)
-        await ctx.send(embed = embed)
-    else:
-        list = [user.mention for user in Muted]
-        text = ''
-        for mention in list:
-            text += mention
-        embed = discord.Embed(description = text, color = 0x0e15d8)
-        await ctx.send(embed = embed)
-
-@bot.command(aliases=['oscour', 'aled'])
-async def Help(ctx):
-    await ctx.send("```$mute @quelqu'un  mute la personne\n$unmute @quelqu'un unmute la personne (voc aussi)\n$list déroule la liste des gens qui sont mutés sur ce serveur\n$mutevoice @quelqu'un mute la voix de la personne si sur vocal\n\n$delete x, x un nombre, supprime autant de messages que x\n$delete bot x comme la précédente mais que pour les messages du bot\n\n$bdm @quelqu'un bouge cette personne dans 'blague de merde', que si déjà en vocal\n$avis @quelqu'un bouge la personne dans'avis biaisé' (seulement Hugo et Flavien(pour le moment j'éspère))\n\n$Flavien envoie un petit message mignon à Flavien alias Thimothé\n$emoji :nomEmoji: renvoie l'emoji custom dans sa taille originale\n$bigemoji :nomEmoji: x  renvoie l'emoji custom aggrandie en taille 2 ou si précisé multiplié par un facteur x```")
-    await ctx.message.delete()
+    elif Message(message,"$help") or Message(message,"$oscour") or Message(message,"$aled"):# == "$help": #or "$aled" or "$oscour":
+        await message.channel.send("```$mute @quelqu'un  mute la personne\n$unmute @quelqu'un unmute la personne (voc aussi)\n$list déroule la liste des gens qui sont mutés sur ce serveur\n$mutevoice @quelqu'un mute la voix de la personne si sur vocal\n\n$delete x, x un nombre, supprime autant de messages que x\n$delete bot x comme la précédente mais que pour les messages du bot\n\n$bdm @quelqu'un bouge cette personne dans 'blague de merde', que si déjà en vocal\n$avis @quelqu'un bouge la personne dans 'avis biaisé' (seulement Hugo et Flavien(pour le moment j'éspère))\n\n$Flavien envoie un petit message mignon à Flavien alias Thimothé\n$emoji :nomEmoji: renvoie l'emoji custom dans sa taille originale\n$bigemoji :nomEmoji: x  renvoie l'emoji custom aggrandie en taille 2 ou si précisé multiplié par un facteur x```")
+        await message.delete()

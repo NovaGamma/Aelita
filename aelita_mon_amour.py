@@ -8,33 +8,46 @@ def Admin(author):
     return author.guild_permissions.administrator
 
 async def get_guilds():
-    Putin = ''
-    Muffin = ''
-    Stock = ''
-    async for guild in bot.fetch_guilds():
+    async for guild in client.fetch_guilds():
         if guild.name == "Poutine lovers":
-            Putin = bot.get_guild(guild.id)
+            Putin = client.get_guild(guild.id)
         elif guild.name == "Muffin Sect":
-            Muffin = bot.get_guild(guild.id)
+            Muffin = client.get_guild(guild.id)
         elif guild.name == "Stock Market":
-            Stock = bot.get_guild(guild.id)
+            Stock = client.get_guild(guild.id)
     return [Putin,Muffin,Stock]
 
-@bot.event
+@client.event
 async def on_ready():
     talk.guilds = await get_guilds()
     global Guild
     Guild = talk.guilds[1]
     print("Hi Elvin i'm here")
     activity = discord.CustomActivity("AHHHHH")
-    await bot.change_presence(activity = activity)
+    await client.change_presence(activity = activity)
 
-@bot.listen('on_message')
-async def process(message):
-    if message.author == bot.user:
+@client.event
+async def on_message(message):
+    if message.author == client.user:
         return
 
-    if len(message.mentions) > 0 and message.mentions[0] == bot.user:
+    if message.author.id == Elvin and message.content.startswith('$Voice'):
+        voice_channel = message.author.voice.channel
+        if voice_channel != None:
+            channel = voice_channel.name
+            vc = await voice_channel.connect()
+            with open('test.mp3','rb') as data:
+                vc.send_audio_packet(data,encode = False)
+            #player = vc.create_ffmpeg_player('test.mp3')
+            #player.start()
+            #while not player.is_done():
+            #    await asyncio.sleep(1)
+            # disconnect after the player has finished
+            #player.stop()
+            #await vc.disconnect()
+
+
+    if len(message.mentions) > 0 and message.mentions[0] == client.user:
         if message.content[0] == '<' and message.content[len(message.content)-1] == '>':
             global count
             global ctime
@@ -81,14 +94,44 @@ async def process(message):
     if 'talk' in globals() and len(talk.connected) != 0 and talk.receiving(message): #message.channel.id == talk.channel.id:
         await talk.log(message)
 
+    if Message(message,'$'):
+        if Message(message,'$M'):
+            await motus(message)
+        else:
+            await Command(message)
+        return
+
     if Message(message,'&'):
         await talk.connect(message)
         return
 
+    for game in Games:#part that will check if the received message belong to a message sent in a game to be treated by a dedicated function
+        if message.channel.category.id == game.gameCategory.id:
+            await gameMessage(message,game)
+
+    if message.content == ("Create Game") and message.channel.name == "games":
+        if not inGame(message.author):
+            await createGame(message,Guild)
+            await message.delete()
+        else:
+            await message.channel.send(message.author.mention + " You're already in a game, you can't create one",delete_after = 30)
+            await message.delete()
+        return
+
+    if message.content == "delete game":
+        if message.author.guild_permissions.administrator:
+            categoryId = message.channel.category_id
+            for category in Guild.categories:
+                if categoryId == category.id and "Game" in category.name:
+                    for channel in category.channels:
+                        await channel.delete()
+                    await category.delete()
+                    return
+
     if message.channel.guild.name in Motus.keys():
         await motus(message)
 
-@bot.event
+@client.event
 async def on_reaction_add(reaction,user):
     if reaction.count == 1 and reaction.emoji == "‼️":
         if reaction.message.author.voice != None:
@@ -116,4 +159,4 @@ async def on_reaction_add(reaction,user):
 #-------------------- ‼️
 with open('Id/id.txt','r') as IdFile:
     id = IdFile.read()
-bot.run(id)
+client.run(id)
