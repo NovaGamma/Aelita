@@ -21,19 +21,22 @@ def convert(text):
     i = 0
     while i < len(text):
         char = text[i]
-        if char in ['*','x','/',':','+','-','^','(',')','!']:
-            if temp != '':
-                result.append(temp.strip())
-                temp = ''
-            result.append(char)
+        if char in ['*','/',':','+','-','^','(',')','!']:
+            if char == '-' and text[i-1] in ['*','/',':','+','-','^','(',')','!']:
+                temp += char
+            else:
+                if temp.strip() != '':
+                    result.append(temp.strip())
+                    temp = ''
+                result.append(char)
         elif i < len(text)-1 and char+text[i+1] == 'ln':
-            if temp != '':
+            if temp.strip() != '':
                 result.append(temp.strip())
                 temp = ''
             result.append(char+text[i+1])
             i = i+1
         elif i < len(text)-2 and char+text[i+1]+text[i+2] in ['sin','tan','cos']:
-            if temp != '':
+            if temp.strip() != '':
                 result.append(temp.strip())
                 temp = ''
             result.append(char+text[i+1]+text[i+2])
@@ -41,7 +44,7 @@ def convert(text):
         else:
             temp += char
         i += 1
-    if temp != '':
+    if temp.strip() != '':
         result.append(temp)
     return result
 

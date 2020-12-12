@@ -1,5 +1,31 @@
 from init_refactor import*
 
+@bot.command()
+async def say(ctx,*args):
+    text = ''
+    for arg in args:
+        text += arg
+    engine.save_to_file(text, 'Speech/test.mp3')
+    engine.runAndWait()
+    voice = get(bot.voice_clients, guild=ctx.guild)
+    voice.play(discord.FFmpegPCMAudio("Speech/test.mp3"))
+
+@bot.command()
+async def getRate(ctx):
+    await ctx.send(engine.getProperty('rate'))
+
+@bot.command()
+async def setRate(ctx,*args):
+    engine.setProperty('rate',int(args[0]))
+
+@bot.command()
+async def setVolume(ctx,*args):
+    engine.setProperty('volume',float(args[0]))
+
+@bot.command()
+async def getVolume(ctx,*args):
+    await ctx.send(engine.getProperty('volume'))
+
 @bot.command(pass_context=True, aliases=['j', 'joi'])
 async def join(ctx):
     channel = ctx.message.author.voice.channel

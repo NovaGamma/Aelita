@@ -10,6 +10,9 @@ from PIL import Image, ImageDraw, ImageFont
 from strMath import*
 from discord.utils import get
 import youtube_dl
+import pyttsx3
+
+engine = pyttsx3.init()
 
 BOT_PREFIX = '$'
 bot = commands.Bot(command_prefix=(BOT_PREFIX,'&'))
