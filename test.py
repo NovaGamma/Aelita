@@ -1,8 +1,8 @@
-import pyttsx3
-engine = pyttsx3.init()
-voices = engine.getProperty('voices')
-for voice in voices:
-    print(voice.languages)
-    engine.setProperty('voice', voice.id)
-    engine.say('The quick brown fox jumped over the lazy dog.')
-engine.runAndWait()
+import test2
+import importlib
+
+
+test2.display()
+input()
+importlib.reload(test2)
+test2.display()

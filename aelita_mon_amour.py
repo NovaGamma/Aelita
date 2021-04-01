@@ -1,4 +1,4 @@
-from init_refactor import*
+from init import*
 #from talk import*
 
 def Message(message,text):
@@ -22,17 +22,15 @@ async def get_guilds():
 
 @bot.event
 async def on_ready():
-    #talk.guilds = await get_guilds()
-    #global Guild
-    #Guild = talk.guilds[1]
     print("Hi Elvin i'm here")
-    activity = discord.CustomActivity("AHHHHH")
-    await bot.change_presence(activity = activity)
 
 @bot.listen('on_message')
 async def process(message):
     if message.author == bot.user:
         return
+
+    if len(message.attachments) > 0 and message.attachments[0].url in ["https://tenor.com/view/cow-dancing-animal-gif-16570099","https://media.tenor.co/videos/c42db58f9f0fa315c65db3127ec8d994/mp4"] and message.author == 530140856863162401:
+        await message.delete()
 
     if len(message.mentions) > 0 and message.mentions[0] == bot.user:
         if message.content[0] == '<' and message.content[len(message.content)-1] == '>':
@@ -93,26 +91,17 @@ async def process(message):
 
 @bot.event
 async def on_reaction_add(reaction,user):
-    if reaction.count == 1 and reaction.emoji == "‼️":
-        if reaction.message.author.voice != None:
-            await reaction.message.add_reaction("‼️")
-            await reaction.message.author.move_to([channel for channel in reaction.message.guild.voice_channels if channel.name == "A fait une blague de merde" or channel.name == "blague de merde"][0])
-            return
+    if user == bot.user:
+        return
 
-    if reaction.count == 1 and reaction.emoji == "🤡":
-        if reaction.message.author.voice != None and (reaction.message.author.id == (530726932216807437 or 362644900535074816)):
-            await reaction.message.add_reaction("🤡")
-            await reaction.message.author.move_to([channel for channel in reaction.message.guild.voice_channels if channel.name == "Avis Biaisé"][0])
-            return
-
-
-#embed=discord.Embed(title="Title", url="https://url", description="description", color=0x0e15d8)
-#embed.set_author(name="author name", url="httpauthor link",, icon_url="http icon" member.avatar_url )
-#embed.set_thumbnail(url="httpicon")
-#embed.add_field(name="field name", value="field value", inline=True)
-#embed.set_footer(text="footer text")
-#await ctx.send(embed=embed)
-
+    if reaction.emoji in number_list or reaction.emoji == "✅":
+        for game in Games:
+            if reaction.message == game.message[-1]:
+                if reaction.emoji == "✅":
+                    await game.addPlayer(user)
+                else:
+                    await tictactoe.PlaceT(reaction,user)
+                await reaction.remove(user)
 
 
 #id hugo = 530726932216807437

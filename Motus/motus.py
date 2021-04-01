@@ -2,7 +2,7 @@ from inspect import getsourcefile
 import os.path as path, sys
 current_dir = path.dirname(path.abspath(getsourcefile(lambda:0)))
 sys.path.insert(0, current_dir[:current_dir.rfind(path.sep)])
-from init_refactor import*  # Replace "my_module" here with the module name.
+from init import*  # Replace "my_module" here with the module name.
 sys.path.pop(0)
 
 async def get_guilds():
@@ -311,6 +311,10 @@ async def motus(message):
                                     await message.channel.send(text)
                                     if good == len(Motus[name]['motus']['word']):
                                         await message.channel.send("Bravo,"+message.author.mention+"!")
+                                        try:
+                                            await message.author.send(f"Tu as gagner, il te faut maintenant me renvoyer cette commande\n$Motus {message.guild.id} TONMOT")
+                                        except:
+                                            await message.channel.send(f"{message.author.mention} il semblerait que je ne puisse pas t'envoyer de message, il faut que tu me débloque pour que tu puisse mettre un mot en utilisant la commande \n$Motus {message.guild.id} TONMOT")
                                         del Motus[name]['motus']['word']
                                         del Motus[name]['motus']['author']
                                         del Motus[name]['motus']['status']

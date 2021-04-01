@@ -1,4 +1,4 @@
-from init_refactor import*
+from init import*
 
 def getFont(im,top,middle,bottom):
     fontPath = r'c:\windows\fonts\arial.ttf'
@@ -54,10 +54,6 @@ def Admin(author):
     return author.guild_permissions.administrator
 
 @bot.command()
-async def hello(ctx):
-    await ctx.send('Hello')
-
-@bot.command()
 async def get_emoji(ctx):
     if ctx.author.id == Elvin:
         emojis = await ctx.guild.fetch_emojis()
@@ -65,6 +61,29 @@ async def get_emoji(ctx):
         for url in urls:
             await url[0].save('Emoji/' + url[1] + '.png')
         return
+
+@bot.command()
+async def load(ctx,name):
+    if name == 't':
+        tictactoe.reset()
+        os.system("cls")
+        importlib.reload(tictactoe)
+
+@bot.command()
+async def e(ctx):
+    txt = ctx.message.content.lstrip("$e ")
+    with open('file.py','w') as file:
+        file.write(txt)
+    proc = subprocess.Popen('python file.py', stdin = subprocess.PIPE, stdout = subprocess.PIPE,stderr=subprocess.STDOUT)
+    stdout, stderr = proc.communicate()
+    with open('result.txt','w') as result:
+        result.write(stdout.decode())
+
+    with open('result.txt','r') as result:
+        txt = [line for line in result if line != '\n']
+
+    txt = ''.join(txt)
+    await ctx.send(f"The result is :\n```{txt}```")
 
 @bot.command()
 async def save_emoji(ctx):
@@ -76,7 +95,7 @@ async def save_emoji(ctx):
 
 @bot.command()
 async def emoji(ctx,Name):
-    emojis = await message.guild.fetch_emojis()
+    emojis = await ctx.guild.fetch_emojis()
     temp = Name.split(':')
     name = temp[1] if len(temp) > 1 else ''
     for emoji in emojis:
@@ -96,6 +115,12 @@ async def meme(ctx,top='',middle='',bottom=''):
             with open('Temp/'+attachment.filename,'rb') as file:
                 await ctx.send(file = discord.File(file))
             os.remove('Temp/'+attachment.filename)
+    await ctx.message.delete()
+
+@bot.command()
+async def say(ctx):
+    text = ctx.message.content.lstrip("$say ")
+    await ctx.send(f"```{text}```")
     await ctx.message.delete()
 
 @bot.command()
@@ -135,20 +160,46 @@ async def calc(ctx):
     else:
         await ctx.send("```Vous n'avez rien donné a calculer```")
 
-async def dele(message):
-    await message.delete()
+@bot.command()
+async def Tic(ctx):
+    await tictactoe.InitBoardT(ctx,ctx.message.author)
+
+@bot.command()
+async def P4(ctx):
+    await tictactoe.InitBoard4(ctx,ctx.message.author)
+
+@bot.command()
+async def Join(ctx):
+    name = ctx.message.mentions[0]
+    g = [i for i in Games if len(i.players) == 1 and i.players[0].mention == name.mention]
+    await g[0].addPlayer(ctx.message.author)
+    await ctx.message.delete()
+
+@bot.command()
+async def p(ctx,number):
+    try:
+        number = int(number)
+    except:
+        await ctx.send("``Has to be a number``")
+        await ctx.message.delete()
+    if 0 < number < 10:
+        await tictactoe.Place(ctx, number)
+        await ctx.message.delete()
 
 @bot.command()
 async def delete(ctx,*args):
-    if Admin(ctx.author) or ctx.author.id == Elvin:
+    if (Admin(ctx.author) or ctx.author.id == Elvin):
         if len(args) > 1 and args[0] == 'bot':
             if args[1].isdigit():
                 number=int(args[1])
+                if number > 10 and ctx.author.id == 808400166595985518:
+                    await ctx.message.delete()
+                    return
                 messages = await ctx.message.channel.history(limit=number+1).flatten()
                 for m in messages:
                     if m.author==bot.user:
                         await m.delete()
-            await message.delete()
+            await ctx.message.delete()
         else:
             if args[0].isdigit():
                 number=int(args[0])
@@ -202,7 +253,7 @@ async def embed(ctx):
 
 @bot.command()
 async def mute(ctx):
-    if Admin(ctx.author) and not(ctx.message.channel.id == 772515947503943690):
+    if Admin(ctx.author) and not(ctx.message.channel.id == 772515947503943690) or ctx.author.id == Elvin:
         to_mute = ctx.message.mentions
         if "$mutevoice" in ctx.message.content:
             for m in to_mute:
@@ -216,8 +267,26 @@ async def mute(ctx):
     return
 
 @bot.command()
+async def realMute(ctx):
+    if ctx.author.id == Elvin or ctx.author.id == 530726932216807437:
+        to_mute = ctx.message.mentions[0]
+        if to_mute.id == Elvin or to_mute.id == 530726932216807437 or to_mute == bot:
+            return
+        roles = to_mute.roles
+        for i in range(1,len(roles)):
+            await to_mute.remove_roles(roles[i])
+        role = ctx.guild.get_role(809786088075821116)
+        await to_mute.add_roles(role)
+
+@bot.command()
+async def realUnmute(ctx):
+    if ctx.author.id == Elvin or ctx.author.id == 530726932216807437:
+        to_mute = ctx.message.mentions[0]
+        await to_mute.remove_roles(ctx.guild.get_role(809786088075821116))
+
+@bot.command()
 async def unmute(ctx):
-    if Admin(ctx.author) and not(ctx.message.channel.id == 772515947503943690):
+    if Admin(ctx.author) and not(ctx.message.channel.id == 772515947503943690) or ctx.author.id == Elvin:
         to_mute = ctx.message.mentions
         if "$unmutevoice" in ctx.message.content:
             for m in to_mute:
@@ -226,7 +295,7 @@ async def unmute(ctx):
                     MutedVoice.remove(m)
         else:
             for m in to_mute:
-                if m in MutedVoice:
+                if m in Muted:
                     Muted.remove(m)
         await ctx.message.delete()
     return
@@ -248,3 +317,11 @@ async def mutelist(ctx):
 async def Help(ctx):
     await ctx.send("```$mute @quelqu'un  mute la personne\n$unmute @quelqu'un unmute la personne (voc aussi)\n$list déroule la liste des gens qui sont mutés sur ce serveur\n$mutevoice @quelqu'un mute la voix de la personne si sur vocal\n\n$delete x, x un nombre, supprime autant de messages que x\n$delete bot x comme la précédente mais que pour les messages du bot\n\n$bdm @quelqu'un bouge cette personne dans 'blague de merde', que si déjà en vocal\n$avis @quelqu'un bouge la personne dans'avis biaisé' (seulement Hugo et Flavien(pour le moment j'éspère))\n\n$Flavien envoie un petit message mignon à Flavien alias Thimothé\n$emoji :nomEmoji: renvoie l'emoji custom dans sa taille originale\n$bigemoji :nomEmoji: x  renvoie l'emoji custom aggrandie en taille 2 ou si précisé multiplié par un facteur x```")
     await ctx.message.delete()
+
+@bot.command()
+async def DelCow(ctx):
+    if ctx.author == Elvin:
+        messages = await ctx.message.channel.history(limit=100).flatten()
+        for m in messages:
+            if m.attachments[0].url in ["https://tenor.com/view/cow-dancing-animal-gif-16570099","https://media.tenor.co/videos/c42db58f9f0fa315c65db3127ec8d994/mp4"]:
+                await m.delete()

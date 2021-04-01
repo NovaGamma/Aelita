@@ -1,4 +1,4 @@
-from init_refactor import*
+from init import*
 
 @bot.command()
 async def say(ctx,*args):
