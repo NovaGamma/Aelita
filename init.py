@@ -13,6 +13,13 @@ import youtube_dl
 import pyttsx3
 import subprocess
 import importlib
+import requests
+import json
+
+import pyperclip
+pyperclip.copy('-p The Score Carry On')
+from pynput.keyboard import Key, Controller
+keyboard = Controller()
 
 engine = pyttsx3.init()
 
@@ -35,9 +42,11 @@ Motus = {}
 Games = []
 
 import TicTacToe.tictactoe as tictactoe
-dico = enchant.Dict("fr_FR")
+#dico = enchant.Dict("fr_FR")
 from command import*
+from music import*
 from Motus.motus import load_motus
+import dev_command as dev
 #from voice import*
 
 Motus = load_motus()

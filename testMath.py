@@ -51,16 +51,16 @@ def derivate(list,variable):#2x ^ 2 - 3x
 
 
 #separator for addition +  for substraction - for multiplication * or x for divsion / or :
-text = '2x^2-3x'
+text = '22/7'
 print(text)
 #temp = convert(text)
 temp = convertFunction(text,'x')
 print(temp)
 #result = derivate(temp,'x')
 
-#print(temp)
-#result = math(temp)
-#print(result)
+print(temp)
+result = math(temp)
+print(result)
 
 
 #converted = convert(text)

@@ -1,1 +1,4 @@
-Hello World
+  File "file.py", line 2
+    
+               ^
+SyntaxError: unexpected EOF while parsing

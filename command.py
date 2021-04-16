@@ -54,54 +54,52 @@ def Admin(author):
     return author.guild_permissions.administrator
 
 @bot.command()
-async def get_emoji(ctx):
-    if ctx.author.id == Elvin:
-        emojis = await ctx.guild.fetch_emojis()
-        urls = [[emoji.url,emoji.name] for emoji in emojis]
-        for url in urls:
-            await url[0].save('Emoji/' + url[1] + '.png')
-        return
+async def randomText(ctx):
+    length = random.randint(1,100)
+    text = ''
+    for i in range(length):
+        number = random.randint(33,126)
+        char = "%c"%number
+        text += char
+    await ctx.channel.send(text)
 
 @bot.command()
-async def load(ctx,name):
-    if name == 't':
-        tictactoe.reset()
-        os.system("cls")
-        importlib.reload(tictactoe)
+async def randomLetters(ctx):
+    length = random.randint(1,20)
+    text = ''
+    for i in range(length):
+        number = random.randint(97,122)
+        char = "%c"%number
+        text += char
+    await ctx.channel.send(text)
 
 @bot.command()
-async def e(ctx):
-    txt = ctx.message.content.lstrip("$e ")
-    with open('file.py','w') as file:
-        file.write(txt)
-    proc = subprocess.Popen('python file.py', stdin = subprocess.PIPE, stdout = subprocess.PIPE,stderr=subprocess.STDOUT)
-    stdout, stderr = proc.communicate()
-    with open('result.txt','w') as result:
-        result.write(stdout.decode())
-
-    with open('result.txt','r') as result:
-        txt = [line for line in result if line != '\n']
-
-    txt = ''.join(txt)
-    await ctx.send(f"The result is :\n```{txt}```")
-
-@bot.command()
-async def save_emoji(ctx):
-    if ctx.author.id == Elvin:
-        for name in os.listdir("Emoji/"):
-            with open("Emoji/" + name,'rb') as image:
-                await ctx.guild.create_custom_emoji(name = name.rstrip('.png'), image = image.read())
-        return
+async def randomWord(ctx):
+    length = random.randint(4,20)
+    text = ''
+    for i in range(length):
+        number = random.randint(97,122)
+        char = "%c"%number
+        text += char
+    word = dico.suggest(text)
+    while len(word) == 0:
+        length = random.randint(4,20)
+        text = ''
+        for i in range(length):
+            number = random.randint(97,122)
+            char = "%c"%number
+            text += char
+        word = dico.suggest(text)
+    await ctx.channel.send(word[0])
 
 @bot.command()
-async def emoji(ctx,Name):
-    emojis = await ctx.guild.fetch_emojis()
-    temp = Name.split(':')
-    name = temp[1] if len(temp) > 1 else ''
-    for emoji in emojis:
-        if name == emoji.name:
-            await ctx.send(emoji.url)
-            break
+async def wiki(ctx,*args):
+    text = '_'.join(args)
+    with requests.get(f'https://fr.wikipedia.org/w/api.php?action=opensearch&search={text}') as r:
+        url = json.loads(r.text)[3][0]
+    with requests.get(url) as r:
+        pass
+    await ctx.channel.send(url)
 
 @bot.command()
 async def meme(ctx,top='',middle='',bottom=''):
@@ -161,32 +159,6 @@ async def calc(ctx):
         await ctx.send("```Vous n'avez rien donné a calculer```")
 
 @bot.command()
-async def Tic(ctx):
-    await tictactoe.InitBoardT(ctx,ctx.message.author)
-
-@bot.command()
-async def P4(ctx):
-    await tictactoe.InitBoard4(ctx,ctx.message.author)
-
-@bot.command()
-async def Join(ctx):
-    name = ctx.message.mentions[0]
-    g = [i for i in Games if len(i.players) == 1 and i.players[0].mention == name.mention]
-    await g[0].addPlayer(ctx.message.author)
-    await ctx.message.delete()
-
-@bot.command()
-async def p(ctx,number):
-    try:
-        number = int(number)
-    except:
-        await ctx.send("``Has to be a number``")
-        await ctx.message.delete()
-    if 0 < number < 10:
-        await tictactoe.Place(ctx, number)
-        await ctx.message.delete()
-
-@bot.command()
 async def delete(ctx,*args):
     if (Admin(ctx.author) or ctx.author.id == Elvin):
         if len(args) > 1 and args[0] == 'bot':
@@ -216,17 +188,6 @@ async def Flavien(ctx):
         await ctx.send("``` Cher Flavien,\n rapelle toi que tu n'auras jamais de pouvoir sur ce serveur\n Avec les compliments de la direction  ```")
 
 @bot.command()
-async def id(ctx):
-    if ctx.author.id == Elvin:
-        if len(ctx.message.channel_mentions) == 1:
-            channel = ctx.message.channel_mentions[0]
-            print(channel.id)
-        elif len(ctx.message.mentions) == 1:
-            user = ctx.message.mentions[0]
-            print(user.name + ' id ' + str(user.id))
-    return
-
-@bot.command()
 async def bdm(ctx):
     if len(ctx.message.mentions) == 1 or len(ctx.message.mentions) == 2:
         mention = ctx.message.mentions
@@ -245,11 +206,6 @@ async def avis(ctx):
                 await user.move_to([channel for channel in ctx.guild.voice_channels if channel.name == "Avis Biaisé"][0])
         await ctx.message.delete()
     return
-
-@bot.command()
-async def embed(ctx):
-    embed = discord.Embed(description = "test Embed", color = 0x0e15d8)
-    await ctx.send(embed = embed)
 
 @bot.command()
 async def mute(ctx):
@@ -317,11 +273,3 @@ async def mutelist(ctx):
 async def Help(ctx):
     await ctx.send("```$mute @quelqu'un  mute la personne\n$unmute @quelqu'un unmute la personne (voc aussi)\n$list déroule la liste des gens qui sont mutés sur ce serveur\n$mutevoice @quelqu'un mute la voix de la personne si sur vocal\n\n$delete x, x un nombre, supprime autant de messages que x\n$delete bot x comme la précédente mais que pour les messages du bot\n\n$bdm @quelqu'un bouge cette personne dans 'blague de merde', que si déjà en vocal\n$avis @quelqu'un bouge la personne dans'avis biaisé' (seulement Hugo et Flavien(pour le moment j'éspère))\n\n$Flavien envoie un petit message mignon à Flavien alias Thimothé\n$emoji :nomEmoji: renvoie l'emoji custom dans sa taille originale\n$bigemoji :nomEmoji: x  renvoie l'emoji custom aggrandie en taille 2 ou si précisé multiplié par un facteur x```")
     await ctx.message.delete()
-
-@bot.command()
-async def DelCow(ctx):
-    if ctx.author == Elvin:
-        messages = await ctx.message.channel.history(limit=100).flatten()
-        for m in messages:
-            if m.attachments[0].url in ["https://tenor.com/view/cow-dancing-animal-gif-16570099","https://media.tenor.co/videos/c42db58f9f0fa315c65db3127ec8d994/mp4"]:
-                await m.delete()

@@ -86,22 +86,34 @@ def checkWinT(board):
     return checkDiagonalsT(board)
 
 def checkDiagonals4(board,sign):
+    import numpy as np
+    for i in range(3,6):
+        for j in range(0,4):
+            if board[i][j]==sign and board[i-1][j+1]==sign and board[i-2][j+2]==sign and board[i-3][j+3]==sign:
+                return 1
+    for i in range(len(board)):
+        board[i] = np.flip(board[i])
+    for i in range(3,6):
+        for j in range(0,4):
+            if board[i][j]==sign and board[i-1][j+1]==sign and board[i-2][j+2]==sign and board[i-3][j+3]==sign:
+                return 1
     return 0
 
 def checkRows4(board,sign):
     for i in range(len(board)):
-        for j in range(len(board[i])-4):
+        for j in range(len(board[i])-3):
             if board[i][j]==sign and board[i][j+1]==sign and board[i][j+2]==sign and board[i][j+3]==sign:
                 return 1
     return 0
 
 def checkWin4(board,sign):
     import numpy as np
+    from copy import deepcopy
     for newBoard in [board, np.transpose(board)]:
         result = checkRows4(newBoard,sign)
         if result:
             return result
-    return checkDiagonals4(board,sign)
+    return checkDiagonals4(deepcopy(board),sign)
 
 async def PlaceT(ctx,user):
     number = number_list.index(ctx.emoji)
@@ -114,6 +126,7 @@ async def PlaceT(ctx,user):
     if user in game.players:
         player_index = game.players.index(user)
     else:
+        print('User not found')
         return
     if player_index == game.nMove%2:
         if game.type == "tictactoe":
@@ -123,9 +136,9 @@ async def PlaceT(ctx,user):
                 await ctx.message.channel.send("You can't play here",delete_after = 10)
                 return
             text = str(game)
-            await game.message.edit(content = text)
+            await game.message[0].edit(content = text)
             if checkWinT(game.board):
-                await ctx.message.channel.send("We have a winner here !")
+                await ctx.message.channel.send(f"{game.players[player_index].mention} won")
                 Games.remove(game)
             elif game.nMove == 9 and game.type == "tictactoe":
                 await ctx.message.channel.send("It's a draw !")
@@ -152,8 +165,8 @@ async def PlaceT(ctx,user):
                 return
             await game.edit(pos)
             if checkWin4(game.board,'🟡' if player_index == 0 else '🔴'):
-                await ctx.message.channel.send("We have a winner here")
-                Games.pop(game)
+                await ctx.message.channel.send(f"{game.players[player_index].mention} won")
+                Games.remove(game)
                 return
         game.nMove += 1
         if player_index == 0:
@@ -183,10 +196,17 @@ async def InitBoard4(ctx,author):
     game.turn_message = await ctx.send(text)
     text = str(game).split("\n")
     text.pop(len(text)-1)
-    print(repr(text))
     game.message = []
     await ctx.send("".join(number_list[:7]))
     for line in text:
         temp = await ctx.send(line)
         game.message.append(temp)
     await game.message[-1].add_reaction("✅")
+
+@bot.command()
+async def Tic(ctx):
+    await tictactoe.InitBoardT(ctx,ctx.message.author)
+
+@bot.command()
+async def P4(ctx):
+    await tictactoe.InitBoard4(ctx,ctx.message.author)

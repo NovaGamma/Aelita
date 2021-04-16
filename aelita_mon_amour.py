@@ -103,6 +103,22 @@ async def on_reaction_add(reaction,user):
                     await tictactoe.PlaceT(reaction,user)
                 await reaction.remove(user)
 
+@bot.command()
+async def load(ctx,*args):
+    if not ctx.author.id == Elvin:
+        return
+    if len(args) != 0:
+        args[0] = name
+    else:
+        os.system("cls")
+        os.system("python aelita_mon_amour.py")
+        quit()
+        return
+    if name == 't':
+        tictactoe.reset()
+        os.system("cls")
+        importlib.reload(tictactoe)
+        return
 
 #id hugo = 530726932216807437
 #-------------------- ‼️
