@@ -124,4 +124,5 @@ async def load(ctx,*args):
 #-------------------- ‼️
 #with open('Id/id.txt','r') as IdFile:
 #    id = IdFile.read()
-bot.run(BOT_TOKEN)
+token = os.getenv("BOT_TOKEN")
+bot.run(token)
