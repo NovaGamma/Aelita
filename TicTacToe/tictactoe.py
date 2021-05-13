@@ -205,8 +205,8 @@ async def InitBoard4(ctx,author):
 
 @bot.command()
 async def Tic(ctx):
-    await tictactoe.InitBoardT(ctx,ctx.message.author)
+    await InitBoardT(ctx,ctx.message.author)
 
 @bot.command()
 async def P4(ctx):
-    await tictactoe.InitBoard4(ctx,ctx.message.author)
+    await InitBoard4(ctx,ctx.message.author)

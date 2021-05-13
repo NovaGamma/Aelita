@@ -16,19 +16,20 @@ async def Hello(ctx):
 
 @bot.command()
 async def e(ctx):
-    txt = ctx.message.content.lstrip("$e ")
-    with open('file.py','w') as file:
-        file.write(txt)
-    proc = subprocess.Popen('python file.py', stdin = subprocess.PIPE, stdout = subprocess.PIPE,stderr=subprocess.STDOUT)
-    stdout, stderr = proc.communicate()
-    with open('result.txt','w') as result:
-        result.write(stdout.decode())
+    if ctx.author.id == Elvin:
+        txt = ctx.message.content.lstrip("$e ")
+        with open('file.py','w') as file:
+            file.write(txt)
+        proc = subprocess.Popen('python file.py', stdin = subprocess.PIPE, stdout = subprocess.PIPE,stderr=subprocess.STDOUT)
+        stdout, stderr = proc.communicate()
+        with open('result.txt','w') as result:
+            result.write(stdout.decode())
 
-    with open('result.txt','r') as result:
-        txt = [line for line in result if line != '\n']
+        with open('result.txt','r') as result:
+            txt = [line for line in result if line != '\n']
 
-    txt = ''.join(txt)
-    await ctx.send(f"The result is :\n```{txt}```")
+        txt = ''.join(txt)
+        await ctx.send(f"The result is :\n```{txt}```")
 
 @bot.command()
 async def save_emoji(ctx):
@@ -51,13 +52,35 @@ async def emoji(ctx,Name):
 @bot.command()
 async def roles(ctx):
     if ctx.author.id == Elvin:
-        await ctx.channel.send("```{}```".format("\n".join([role.name for role in ctx.guild.roles])))
+        string = "```"
+        for i,v in enumerate(ctx.guild.roles):
+            name = v.name
+            string += f"{i} {name}\n"
+        string += "```"
+        await ctx.channel.send(string)
+
+@bot.command()
+async def people(ctx):
+    if ctx.author.id == Elvin:
+        print(ctx.guild)
+        string = "```"
+        for i,v in enumerate(ctx.guild.members):
+            name = v.name
+            string += f"{i} {name}\n"
+        string += "```"
+        await ctx.channel.send(string)
 
 @bot.command()
 async def give_role(ctx,number):
     if ctx.author.id == Elvin:
         number = int(number)
         await ctx.author.add_roles(ctx.guild.roles[number])
+
+@bot.command()
+async def remove_role(ctx,number):
+    if ctx.author.id == Elvin:
+        number = int(number)
+        await ctx.author.remove_roles(ctx.guild.roles[number])
 
 @bot.command()
 async def id(ctx):
