@@ -122,6 +122,6 @@ async def load(ctx,*args):
 
 #id hugo = 530726932216807437
 #-------------------- ‼️
-with open('Id/id.txt','r') as IdFile:
-    id = IdFile.read()
-bot.run(id)
+#with open('Id/id.txt','r') as IdFile:
+#    id = IdFile.read()
+bot.run(BOT_TOKEN)
