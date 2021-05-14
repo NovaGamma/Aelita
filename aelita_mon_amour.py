@@ -29,9 +29,6 @@ async def process(message):
     if message.author == bot.user:
         return
 
-    if len(message.attachments) > 0 and message.attachments[0].url in ["https://tenor.com/view/cow-dancing-animal-gif-16570099","https://media.tenor.co/videos/c42db58f9f0fa315c65db3127ec8d994/mp4"] and message.author == 530140856863162401:
-        await message.delete()
-
     if len(message.mentions) > 0 and message.mentions[0] == bot.user:
         if message.content[0] == '<' and message.content[len(message.content)-1] == '>':
             global count
@@ -51,22 +48,22 @@ async def process(message):
             word = message.content.lstrip('<@!772507835225210900>').lstrip().split(' ')[0]
             await message.channel.send('https://fr.wikipedia.org/wiki/' + word)
 
-    if len(message.content) == 1 and message.content in al:
-        index = al.index(message.content) + 1
-        if index != len(al):
-            character = al[index]
-            await message.channel.send('```' + character + '```')
+    #if len(message.content) == 1 and message.content in al:
+    #    index = al.index(message.content) + 1
+    #    if index != len(al):
+    #        character = al[index]
+    #        await message.channel.send('```' + character + '```')
 
-    if message.content.isdigit():
-        number = int(message.content)
-        if number == 69:
-            text = "```Nice !```"
-        else:
-            text = "```" +str(number + 1) + "```"
-        if len(text) < 2000:
-            await message.channel.send(text)
-        else:
-            await message.channel.send("```Tu es trop gourmand```")
+    #if message.content.isdigit():
+    #    number = int(message.content)
+    #    if number == 69:
+    #        text = "```Nice !```"
+    #    else:
+    #        text = "```" +str(number + 1) + "```"
+    #    if len(text) < 2000:
+    #        await message.channel.send(text)
+    #    else:
+    #        await message.channel.send("```Tu es trop gourmand```")
 
     if message.author in Muted and not(message.channel.name == "diplomatie" or message.channel.name == "musique") and not(message.author.id == 281432668196044800):
         await message.delete()
