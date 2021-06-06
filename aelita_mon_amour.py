@@ -23,6 +23,10 @@ async def get_guilds():
 @bot.event
 async def on_ready():
     print("Hi Elvin i'm here")
+    stock = [guild for guild in bot.guilds if guild.name == "Stock Market"][0]
+    channel2send = [channel for channel in stock.channels if channel.name == "test"][0]
+    await channel2send.send("I'm ready")
+
 
 @bot.listen('on_message')
 async def process(message):
