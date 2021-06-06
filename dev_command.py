@@ -6,10 +6,10 @@ async def getxD(ctx):
         sum = 0
         total_messages = 0
         for server in bot.guilds:
-            await ctx.channel.send("Doing server : {server.name}")
+            await ctx.channel.send(f"Doing server : {server.name}")
             for channel in server.channels:
-                await ctx.channel.send("Doing channel : {channel.name}")
                 if channel is discord.TextChannel:
+                    await ctx.channel.send(f"Doing channel : {channel.name}")
                     messages = await channel.history()
                     for message in messages:
                         if message.author.id == Elvin:
@@ -17,6 +17,7 @@ async def getxD(ctx):
                             content = message.content
                             if "xD" in content:
                                 sum += 1
+        await ctx.channel.send(f"The total number of xD is {sum}")
 
 
 
