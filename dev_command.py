@@ -8,7 +8,7 @@ async def getxD(ctx):
         for server in bot.guilds:
             await ctx.channel.send(f"Doing server : {server.name}")
             for channel in server.channels:
-                if channel is discord.TextChannel:
+                if type(channel) is discord.TextChannel:
                     await ctx.channel.send(f"Doing channel : {channel.name}")
                     messages = await channel.history()
                     for message in messages:
