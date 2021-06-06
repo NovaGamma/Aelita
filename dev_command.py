@@ -1,6 +1,26 @@
 from init import*
 
 @bot.command()
+async def getxD(ctx):
+    if ctx.author.id == Elvin:
+        sum = 0
+        total_messages = 0
+        for server in bot.guilds:
+            await ctx.channel.send("Doing server : {server.name}")
+            for channel in server.channels:
+                await ctx.channel.send("Doing channel : {channel.name}")
+                if channel is discord.TextChannel:
+                    messages = await channel.history()
+                    for message in messages:
+                        if message.author.id == Elvin:
+                            total_messages += 1
+                            content = message.content
+                            if "xD" in content:
+                                sum += 1
+
+
+
+@bot.command()
 async def get_emoji(ctx):
     if ctx.author.id == Elvin:
         emojis = await ctx.guild.fetch_emojis()
