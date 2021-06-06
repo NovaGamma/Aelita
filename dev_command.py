@@ -10,7 +10,7 @@ async def getxD(ctx):
             for channel in server.channels:
                 if type(channel) is discord.TextChannel:
                     await ctx.channel.send(f"Doing channel : {channel.name}")
-                    messages = await channel.history()
+                    messages = await channel.history().flatten()
                     for message in messages:
                         if message.author.id == Elvin:
                             total_messages += 1
