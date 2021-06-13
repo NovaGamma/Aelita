@@ -3,9 +3,9 @@ from init import*
 @bot.command()
 async def spam(ctx,number):
     if ctx.author.id == Elvin:
-        if type(number) is int:
-            for i in range(number):
-                await ctx.channel.send("A little spam !")
+        number = int(number)
+        for i in range(number):
+            await ctx.channel.send("A little spam !")
 
 @bot.command()
 async def getxD(ctx):
