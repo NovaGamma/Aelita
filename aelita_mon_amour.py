@@ -23,10 +23,6 @@ async def get_guilds():
 @bot.event
 async def on_ready():
     print("Hi Elvin i'm here")
-    #stock = [guild for guild in bot.guilds if guild.name == "Stock Market"][0]
-    #channel2send = [channel for channel in stock.channels if channel.name == "test"][0]
-    #await channel2send.send("I'm ready")
-
 
 @bot.listen('on_message')
 async def process(message):
@@ -51,23 +47,6 @@ async def process(message):
         elif len(message.content.lstrip('<@!772507835225210900>').split(' ')) == 2:
             word = message.content.lstrip('<@!772507835225210900>').lstrip().split(' ')[0]
             await message.channel.send('https://fr.wikipedia.org/wiki/' + word)
-
-    #if len(message.content) == 1 and message.content in al:
-    #    index = al.index(message.content) + 1
-    #    if index != len(al):
-    #        character = al[index]
-    #        await message.channel.send('```' + character + '```')
-
-    #if message.content.isdigit():
-    #    number = int(message.content)
-    #    if number == 69:
-    #        text = "```Nice !```"
-    #    else:
-    #        text = "```" +str(number + 1) + "```"
-    #    if len(text) < 2000:
-    #        await message.channel.send(text)
-    #    else:
-    #        await message.channel.send("```Tu es trop gourmand```")
 
     if message.author in Muted and not(message.channel.name == "diplomatie" or message.channel.name == "musique") and not(message.author.id == 281432668196044800):
         await message.delete()
@@ -123,7 +102,7 @@ async def load(ctx,*args):
 
 #id hugo = 530726932216807437
 #-------------------- ‼️
-#with open('Id/id.txt','r') as IdFile:
-#    id = IdFile.read()
-token = os.getenv("BOT_TOKEN")
+with open('Id/id.txt','r') as IdFile:
+    token = IdFile.read()
+#token = os.getenv("BOT_TOKEN")
 bot.run(token)
