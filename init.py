@@ -3,9 +3,8 @@ from discord.ext import commands
 import os
 import random
 import time
-#from talk import Talk
 from datetime import datetime
-#import enchant
+import enchant
 from PIL import Image, ImageDraw, ImageFont
 from strMath import*
 from discord.utils import get
@@ -15,8 +14,15 @@ import requests
 import json
 
 
+intents = discord.Intents.default()
+intents.members = True
+intents.guilds = True
+intents.messages = True
+intents.emojis = True
+intents.reactions = True
+
 BOT_PREFIX = '$'
-bot = commands.Bot(command_prefix=(BOT_PREFIX,'&'))
+bot = commands.Bot(command_prefix = BOT_PREFIX, intents = intents)
 MutedVoice = []
 Muted = []
 MuteRole = 809786088075821116
@@ -26,18 +32,18 @@ number_list = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️
 
 al = ["%c"%char for char in range(65,91)]
 count = 0
-#talk = Talk(bot)
 ctime = 0
 
 Motus = {}
 Games = []
 
 import TicTacToe.tictactoe as tictactoe
-#dico = enchant.Dict("fr_FR")
+dico = enchant.Dict("fr_FR")
 from command import*
 from music import*
 from Motus.motus import load_motus
 import dev_command as dev
+from talking import*
 #from voice import*
 
 Motus = load_motus()

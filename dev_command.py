@@ -91,6 +91,28 @@ async def roles(ctx):
         await ctx.channel.send(string)
 
 @bot.command()
+async def guilds(ctx):
+    if ctx.author.id == Elvin:
+        string = "```"
+        for i,v in enumerate(bot.guilds):
+            name = v.name
+            string += f"{i} {name}\n"
+        string += "```"
+        await ctx.channel.send(string)
+
+@bot.command()
+async def channels(ctx,index):
+    if ctx.author.id == Elvin:
+        guild = bot.guilds[int(index)]
+        string = "```"
+        for i,v in enumerate(guild.text_channels):
+            name = v.name
+            string += f"{i} {name}\n"
+        string += "```"
+        await ctx.channel.send(string)
+
+
+@bot.command()
 async def people(ctx):
     if ctx.author.id == Elvin:
         print(ctx.guild)

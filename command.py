@@ -123,6 +123,7 @@ async def say(ctx):
 
 @bot.command()
 async def bigemoji(ctx,Name):
+    print(ctx.__dict__)
     emojis = await ctx.guild.fetch_emojis()
     content = Name.lstrip('<')
     name = content.split(':')[1]

@@ -1,5 +1,4 @@
 from init import*
-#from talk import*
 
 def Message(message,text):
     return True if message.content.startswith(text) else False
@@ -23,6 +22,8 @@ async def get_guilds():
 @bot.event
 async def on_ready():
     print("Hi Elvin i'm here")
+    global talk
+    talk = Talk(bot)
 
 @bot.listen('on_message')
 async def process(message):
@@ -52,22 +53,22 @@ async def process(message):
         await message.delete()
         return
 
-    #if 'talk' in globals() and len(talk.connected) != 0 and talk.sending(message): #message.channel.id == talk.log_channel.id:
-        #await talk.send(message)
-        #return
+    if 'talk' in globals() and len(talk.connected) != 0 and talk.sending(message): #message.channel.id == talk.log_channel.id:
+        await talk.send(message)
+        return
 
-    #if 'talk' in globals() and len(talk.connected) != 0 and talk.receiving(message): #message.channel.id == talk.channel.id:
-        #await talk.log(message)
-
-    #if Message(message,'&'):
-    #    await talk.connect(message)
-    #    return
+    if 'talk' in globals() and len(talk.connected) != 0 and talk.receiving(message): #message.channel.id == talk.channel.id:
+        await talk.log(message)
 
     if isinstance(message.channel, discord.abc.PrivateChannel):
         return
 
     if message.channel.guild.name in Motus.keys():
         await motus(message)
+
+@bot.command()
+async def connect(ctx):
+    await talk.connect(ctx.message)
 
 @bot.event
 async def on_reaction_add(reaction,user):

@@ -1,31 +1,24 @@
 from init import*
 
-async def get_guilds():
-    async for guild in client.fetch_guilds():
-        if guild.name == "Poutine lovers":
-            Putin = client.get_guild(guild.id)
-        elif guild.name == "Muffin Sect":
-            Muffin = client.get_guild(guild.id)
-        elif guild.name == "Stock Market":
-            Stock = client.get_guild(guild.id)
-    return [Putin,Muffin,Stock]
 
 def Message(message,text):
     return True if message.content.startswith(text) else False
 
+
 def Admin(author):
     return author.guild_permissions.administrator
 
-class Connection():
+
+class Connection:
     def __init__(self,guild,category):
         self.guild = guild
         self.category = category
         self.channels = []
 
 
-class Talk():
+class Talk:
     def __init__(self,client):
-        self.guilds = None
+        self.guilds = client.guilds
         self.channels = None
         self.choosing = None
         self.guild = None
@@ -45,17 +38,17 @@ class Talk():
                 return True
         return False
 
-    async def choose(self,temp):
-        self.guild = self.guilds[int(temp[1]) - 1]
+    async def choose(self,temp,Guild):
+        self.guild = self.guilds[int(temp[1])]
         if len(self.connected) == 0:
-            category = await self.guilds[2].create_category(name = self.guild.name, position = 2)
-            channel = self.guild.text_channels[int(temp[2]) - 1]
+            category = await Guild.create_category(name = self.guild.name, position = 2)
+            channel = self.guild.text_channels[int(temp[2])]
             self.connected = [Connection(self.guild,category)]
-            log_channel = await self.guilds[2].create_text_channel(name = channel.name,category = category)
+            log_channel = await Guild.create_text_channel(name = channel.name,category = category)
             self.connected[0].channels = [[channel,log_channel]]
         else:
-            channel = self.connected[0].guild.text_channels[int(temp[2]) - 1]
-            log_channel = await self.guilds[2].create_text_channel(name = channel.name,category = self.connected[0].category)
+            channel = self.connected[0].guild.text_channels[int(temp[2])]
+            log_channel = await Guild.create_text_channel(name = channel.name,category = self.connected[0].category)
             self.connected[0].channels.append([channel, log_channel])
 
     async def send(self,message):
@@ -82,7 +75,8 @@ class Talk():
                 await other.send(embed = embed)
 
     async def connect(self,message):
-        if Message(message,"&connect") and message.author.id == 281432668196044800 and message.guild.name == "Stock Market":
+        if message.author.id == 281432668196044800 and message.guild.name == "Stock Market":
             temp = message.content.split(" ")
             if len(temp) == 3:
-                await self.choose(temp)
+                print("choosing")
+                await self.choose(temp,message.guild)
