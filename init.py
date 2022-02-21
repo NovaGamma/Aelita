@@ -31,6 +31,7 @@ Elvin = 281432668196044800
 number_list = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣']
 
 al = ["%c"%char for char in range(65,91)]
+al.append('-')
 count = 0
 ctime = 0
 
