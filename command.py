@@ -224,6 +224,15 @@ async def mute(ctx):
     return
 
 @bot.command()
+async def mutevoice(ctx):
+    if Admin(ctx.author):
+        to_mute = ctx.message.mentions
+        for m in to_mute:
+            if m.voice != None:
+                await m.edit(mute = True)
+        await ctx.message.delete()
+
+@bot.command()
 async def realMute(ctx):
     if ctx.author.id == Elvin or ctx.author.id == 530726932216807437:
         to_mute = ctx.message.mentions[0]

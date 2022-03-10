@@ -30,25 +30,6 @@ async def process(message):
     if message.author == bot.user:
         return
 
-    if len(message.mentions) > 0 and message.mentions[0] == bot.user:
-        if message.content[0] == '<' and message.content[len(message.content)-1] == '>':
-            global count
-            global ctime
-            if count == 5:
-                count = 0
-            if count != 0:
-                factor = (time.time() - ctime)%10
-                if factor > count:
-                    count = 0
-                else:
-                    count -= factor
-            await message.channel.send("```" + mention[count] + "```")
-            count += 1
-            ctime = time.time()
-        elif len(message.content.lstrip('<@!772507835225210900>').split(' ')) == 2:
-            word = message.content.lstrip('<@!772507835225210900>').lstrip().split(' ')[0]
-            await message.channel.send('https://fr.wikipedia.org/wiki/' + word)
-
     if message.author in Muted and not(message.channel.name == "diplomatie" or message.channel.name == "musique") and not(message.author.id == 281432668196044800):
         await message.delete()
         return
@@ -69,6 +50,10 @@ async def process(message):
 @bot.command()
 async def connect(ctx):
     await talk.connect(ctx.message)
+
+@bot.command()
+async def disconnect(ctx):
+    await talk.disconnect(ctx.message)
 
 @bot.event
 async def on_reaction_add(reaction,user):

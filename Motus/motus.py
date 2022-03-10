@@ -371,7 +371,7 @@ async def motus(message):
                 return
             if 'word' in Motus[name]['motus'].keys():
                 print(message.channel.guild.name+'  '+str(message.author.display_name)+'  '+message.content)
-                if not(str(message.author.id)==Motus[name]['motus']['author']) or message.author.id == Elvin:
+                if not(message.author.id == Motus[name]['motus']['author']) or message.author.id == Elvin:
                     word=message.content#here word is the word given by a person that's trying to find the real word
                     if len(word)==len(Motus[name]['motus']['word']):
                         if word[0]==Motus[name]['motus']['word'][0]:

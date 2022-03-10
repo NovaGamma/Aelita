@@ -38,6 +38,10 @@ class Talk:
                 return True
         return False
 
+    async def disconnect(self,ctx):
+        if this.sending(ctx.message):
+            return
+
     async def choose(self,temp,Guild):
         self.guild = self.guilds[int(temp[1])]
         if len(self.connected) == 0:
