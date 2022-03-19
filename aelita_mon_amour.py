@@ -22,6 +22,7 @@ async def get_guilds():
 @bot.event
 async def on_ready():
     print("Hi Elvin i'm here")
+    print(os.system('chdir'))
     global talk
     talk = Talk(bot)
 

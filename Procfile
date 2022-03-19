@@ -1,1 +1,1 @@
-worker: python aelita_mon_amour.py
+worker: run.bat
