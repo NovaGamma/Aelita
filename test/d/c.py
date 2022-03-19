@@ -1,8 +1,7 @@
-from variable import f
+import enchant
+import os
 
-class Test():
-    def __init__(self,x):
-        self.x = x
+print(enchant.get_user_config_dir())
+dico = enchant.Dict("fr_FR")
 
-    def display(self):
-        print(f(self.x))
+print(dico.check('BONJOUR'))
