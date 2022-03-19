@@ -5,7 +5,6 @@ import random
 import time
 from datetime import datetime
 import enchant
-from PIL import Image, ImageDraw, ImageFont
 from strMath import*
 from discord.utils import get
 import subprocess

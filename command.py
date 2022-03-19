@@ -1,40 +1,40 @@
 from init import*
 
-def getFont(im,top,middle,bottom):
-    fontPath = r'c:\windows\fonts\arial.ttf'
-    size = 90
-    font = ImageFont.truetype(fontPath, size)
-    sizeTop = font.getlength(top)
-    sizeMiddle = font.getlength(middle)
-    sizeBottom = font.getlength(bottom)
-    if sizeTop >= sizeMiddle:
-        if sizeTop >= sizeBottom:
-            text = top
-        else:
-            text = bottom
-    elif sizeMiddle >= sizeBottom:
-        text = middle
-    else:
-        text = bottom
-    temp = font.getlength(text)
-    while temp > im.width:
-        size -= 2
-        font = ImageFont.truetype(fontPath, size)
-        temp = font.getlength(text)
-    font = ImageFont.truetype(fontPath, size)
-    return [font,size]
-
-def draw(image,top = '', middle = '', bottom = ''):
-    temp = getFont(image,top,middle,bottom)
-    font = temp[0]
-    fontSize = temp[1]
-    draw = ImageDraw.Draw(image)
-    if top != '':
-        draw.text((0,0),top,font = font)
-    if middle != '':
-        draw.text((0,(image.height-fontSize)/2),middle,font = font)
-    if bottom != '':
-        draw.text((0, image.height-fontSize),bottom,font = font)
+#def getFont(im,top,middle,bottom):
+#    fontPath = r'c:\windows\fonts\arial.ttf'
+#    size = 90
+#    font = ImageFont.truetype(fontPath, size)
+#    sizeTop = font.getlength(top)
+#    sizeMiddle = font.getlength(middle)
+#    sizeBottom = font.getlength(bottom)
+#    if sizeTop >= sizeMiddle:
+#        if sizeTop >= sizeBottom:
+#            text = top
+#        else:
+#            text = bottom
+#    elif sizeMiddle >= sizeBottom:
+#        text = middle
+#    else:
+#        text = bottom
+#    temp = font.getlength(text)
+#    while temp > im.width:
+#        size -= 2
+#        font = ImageFont.truetype(fontPath, size)
+#        temp = font.getlength(text)
+#    font = ImageFont.truetype(fontPath, size)
+#    return [font,size]
+#
+#def draw(image,top = '', middle = '', bottom = ''):
+#    temp = getFont(image,top,middle,bottom)
+#    font = temp[0]
+#    fontSize = temp[1]
+#    draw = ImageDraw.Draw(image)
+#    if top != '':
+#        draw.text((0,0),top,font = font)
+#    if middle != '':
+#        draw.text((0,(image.height-fontSize)/2),middle,font = font)
+#    if bottom != '':
+#        draw.text((0, image.height-fontSize),bottom,font = font)
 
 async def get_guilds():
     Putin = ''
@@ -101,19 +101,19 @@ async def wiki(ctx,*args):
         pass
     await ctx.channel.send(url)
 
-@bot.command()
-async def meme(ctx,top='',middle='',bottom=''):
-    if len(ctx.message.attachments) == 1:
-        async with ctx.message.channel.typing():
-            attachment = ctx.message.attachments[0]
-            await attachment.save('Temp/'+attachment.filename)
-            im = Image.open('Temp/'+attachment.filename)
-            draw(im,top,middle,bottom)
-            im.save('Temp/'+attachment.filename)
-            with open('Temp/'+attachment.filename,'rb') as file:
-                await ctx.send(file = discord.File(file))
-            os.remove('Temp/'+attachment.filename)
-    await ctx.message.delete()
+#@bot.command()
+#async def meme(ctx,top='',middle='',bottom=''):
+#    if len(ctx.message.attachments) == 1:
+#        async with ctx.message.channel.typing():
+#            attachment = ctx.message.attachments[0]
+#            await attachment.save('Temp/'+attachment.filename)
+#            im = Image.open('Temp/'+attachment.filename)
+#            draw(im,top,middle,bottom)
+#            im.save('Temp/'+attachment.filename)
+#            with open('Temp/'+attachment.filename,'rb') as file:
+#                await ctx.send(file = discord.File(file))
+#            os.remove('Temp/'+attachment.filename)
+#    await ctx.message.delete()
 
 @bot.command()
 async def say(ctx):
