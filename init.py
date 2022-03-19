@@ -38,6 +38,7 @@ Motus = {}
 Games = []
 
 import TicTacToe.tictactoe as tictactoe
+print(enchant.get_user_config_dir())
 dico = enchant.Dict("fr_FR")
 from command import*
 from music import*
