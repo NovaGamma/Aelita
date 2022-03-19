@@ -38,7 +38,7 @@ Motus = {}
 Games = []
 
 import TicTacToe.tictactoe as tictactoe
-#dico = enchant.Dict("fr_FR")
+dico = enchant.Dict("fr_FR")
 from command import*
 from music import*
 from Motus.motus import load_motus
