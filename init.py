@@ -13,6 +13,9 @@ import requests
 import json
 
 
+library_path = os.environ.get("TEST")
+print(os.path.exists(library_path))
+
 intents = discord.Intents.default()
 intents.members = True
 intents.guilds = True
