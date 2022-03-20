@@ -4,8 +4,8 @@ import os
 import random
 import time
 from datetime import datetime
-library_path = os.environ.get("TEST")
-print(os.path.exists(library_path))
+#library_path = os.environ.get("TEST")
+#print(os.path.exists(library_path))
 import enchant
 from strMath import*
 from discord.utils import get
