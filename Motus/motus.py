@@ -16,7 +16,7 @@ async def get_guilds():
             Muffin = bot.get_guild(guild.id)
         elif guild.name == "Stock Market":
             Stock = bot.get_guild(guild.id)
-    return [Putin,Muffin,Stock]
+    return [Muffin,Stock]
 
 def load_motus(guild='all'):
     #Motus = {}
@@ -143,6 +143,15 @@ def get_guild(id):
                     name = temp_guild[0]
     return name
 
+@bot.command(name = "Mtest")
+async def Mtest(ctx, *args):
+    word = args[0]
+    if dico.check(word):
+        await ctx.send("```Le mot est dans le dictionnaire```")
+    else:
+        await ctx.send("```Le mot n'est pas dans le dictionnaire```")
+
+
 @bot.command(name = 'Motus')
 async def fMotus(ctx,*args):
     temp = args
@@ -169,6 +178,7 @@ async def fMotus(ctx,*args):
                         Motus[name]['motus']['author'] = ctx.author.id
                         Motus[name]['motus']['players'] = {}
                         Motus[name]['motus']['counter'] = 0
+                        Motus[name]['motus']['status'] = []
                         save_motus(name)
                         for guild in await get_guilds():
                             if guild.name == name:
@@ -176,7 +186,7 @@ async def fMotus(ctx,*args):
                                 await channel.send("```Le mot actuel contient "+str(len(Motus[channel.guild.name]['motus']['word']))+" lettres et commence par un "+str(Motus[channel.guild.name]['motus']['word'][0])+"```")
                         await ctx.send("```Ton mot est enregistré```")
                     else:
-                        await ctx.send("```Le mot doit avoir une longueur comprise entre 5 lettres et 15 lettres```")
+                        await ctx.send("```Le mot doit avoir une longueur comprise entre 5 lettres et 17 lettres```")
                 else:
                     await ctx.send("```Tu n'es pas le dernier vainqueur```")
             else:
@@ -323,7 +333,8 @@ async def send_points(message,name):
     list_players.sort(key = lambda x: x[1])
     list_players.append([Motus[name]['motus']['author'],Motus[name]['motus']['counter']])
     for player in list_players:
-        text += f"{guild.get_member(int(player[0])).nick} gagne {player[1]} point{'s' if player[1] > 1 else ''}\n"
+        if guild.get_member(int(player[0])) is not None:
+            text += f"{guild.get_member(int(player[0])).nick} gagne {player[1]} point{'s' if player[1] > 1 else ''}\n"
     await message.channel.send(f"```{text}```")
 
 def add_points(name):
@@ -339,6 +350,25 @@ def add_points(name):
     else:
         Motus[name]['players'][author_id] = Motus[name]['motus']['counter']
 
+@bot.command()
+async def MRemovePoints(ctx, mention, number):
+    if ctx.author.id == Elvin:
+        user = ctx.message.mentions[0]
+        name = user.display_name
+        id = user.id
+        c_name = ctx.channel.guild.name
+        Motus[c_name]['players'][str(id)] -= int(number)
+        await ctx.send(f"```A correctement retiré {number} points à {name} -> {Motus[c_name]['players'][str(id)]}```")
+
+@bot.command()
+async def MAddPoints(ctx, mention, number):
+    if ctx.author.id == Elvin:
+        user = ctx.message.mentions[0]
+        name = user.display_name
+        id = user.id
+        c_name = ctx.channel.guild.name
+        Motus[c_name]['players'][str(id)] += int(number)
+        await ctx.send(f"```A correctement rajouté {number} points à {name} -> {Motus[c_name]['players'][str(id)]}```")
 
 @bot.command()
 async def Mleaderboard(ctx):
@@ -349,13 +379,16 @@ async def Mleaderboard(ctx):
         list_players = [[id, points] for id, points in Motus[name]['players'].items()]
         list_players.sort(key = lambda x: x[1])
         for index,player in enumerate(list_players[::-1]):
-            text += f"#{index+1} {guild.get_member(int(player[0])).nick} a {player[1]} points\n"
+            if guild.get_member(int(player[0])) is not None:
+                text += f"#{index+1} {guild.get_member(int(player[0])).nick} a {player[1]} points\n"
         await ctx.channel.send(f"```{text}```")
 
 async def motus(message):
     if message.channel.guild.name in Motus.keys():
         name=message.channel.guild.name
         if message.channel.id in Motus[name]['channels']:
+            if not "word" in Motus[name]['motus'].keys():
+                return
             word = message.content
             if '-' in word:
                 temp = ''.join(word.split('-'))
@@ -389,10 +422,16 @@ async def motus(message):
                                 text = temp[0]
                                 await message.channel.send(text)
                                 if good == len(Motus[name]['motus']['word']):
-                                    if str(message.author.id) in Motus[name]['motus']['players'].keys():
-                                        Motus[name]['motus']['players'][str(message.author.id)] += int(len(Motus[name]['motus']['word'])/2)
+                                    if Motus[name]['motus']['counter'] == 1:
+                                        if str(message.author.id) in Motus[name]['motus']['players'].keys():
+                                            Motus[name]['motus']['players'][str(message.author.id)] += 3*(int(len(Motus[name]['motus']['word'])/2))
+                                        else:
+                                            Motus[name]['motus']['players'][str(message.author.id)] = 3*(int(len(Motus[name]['motus']['word'])/2))
                                     else:
-                                        Motus[name]['motus']['players'][str(message.author.id)] = int(len(Motus[name]['motus']['word'])/2)
+                                        if str(message.author.id) in Motus[name]['motus']['players'].keys():
+                                            Motus[name]['motus']['players'][str(message.author.id)] += int(len(Motus[name]['motus']['word'])/2)
+                                        else:
+                                            Motus[name]['motus']['players'][str(message.author.id)] = int(len(Motus[name]['motus']['word'])/2)
                                     await message.channel.send(f"Bravo,{message.author.mention}!\n le mot a été trouvé en {Motus[name]['motus']['counter']} essais")
                                     await send_points(message,name)
                                     add_points(name)
@@ -411,7 +450,7 @@ async def motus(message):
                                     channel = message.channel
                             else:
                                 await message.delete(delay=20)
-                                await message.channel.send("```Ce mot n'existe pas```",delete_after=20)
+                                await message.channel.send("```Ce mot n'existe pas ou n'est pas dans le dictionnaire```", delete_after = 20)
                         else:
                             await message.delete(delay=20)
                             await message.channel.send("```Tu dois donner un mot avec "+Motus[name]['motus']['word'][0]+" comme première lettre```",delete_after=20)

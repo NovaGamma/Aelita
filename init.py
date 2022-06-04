@@ -4,16 +4,15 @@ import os
 import random
 import time
 from datetime import datetime
-#library_path = os.environ.get("TEST")
-#print(os.path.exists(library_path))
 import enchant
 from strMath import*
 from discord.utils import get
+from PIL import Image, ImageDraw, ImageFont
 import subprocess
 import importlib
 import requests
 import json
-
+from bs4 import BeautifulSoup
 
 
 intents = discord.Intents.default()
@@ -41,7 +40,6 @@ Motus = {}
 Games = []
 
 import TicTacToe.tictactoe as tictactoe
-print(enchant.list_languages())
 dico = enchant.Dict("fr_FR")
 from command import*
 from music import*
@@ -52,6 +50,7 @@ from talking import*
 
 Motus = load_motus()
 
+print(discord.__version__)
 
 Guild = None
 

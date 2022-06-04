@@ -92,14 +92,57 @@ async def randomWord(ctx):
         word = dico.suggest(text)
     await ctx.channel.send(word[0])
 
+
+@bot.command()
+async def dice(ctx, *args):
+    import random
+    if len(args) == 2:
+        lower = int(args[0])
+        upper = int(args[1])
+    if len(args) == 1:
+        lower = 1
+        upper = int(args[0])
+    roll = random.randint(lower,upper)
+    await ctx.channel.send(f"``{ctx.author.display_name} Rolled {roll} !``")
+    if upper == 100 and roll>=90:
+        await ctx.channel.send(f"``Echec critique {roll} !``")
+    if upper == 100 and roll<=10:
+        await ctx.channel.send("``Réussite critique !``")
+
+
+def clean(list):
+    return [item for item in list if item not in ["\n","",' ']]
+
+
 @bot.command()
 async def wiki(ctx,*args):
     text = '_'.join(args)
     with requests.get(f'https://fr.wikipedia.org/w/api.php?action=opensearch&search={text}') as r:
         url = json.loads(r.text)[3][0]
     with requests.get(url) as r:
-        pass
+        soup = BeautifulSoup(r.text,'html.parser')
+        div = soup.find('div',class_="mw-parser-output")
+        ps = []
+        for el in clean(div.contents):
+            if el.name == 'p':
+                ps.append(el)
+
+            if len(ps) == 2:
+                break
+            if 'role' in el.attrs and el['role'] == 'navigation':
+                break
+        text = ''
+        for el in ps:
+            text += el.get_text()
     await ctx.channel.send(url)
+    if len(text) > 1999:
+        for i in range(len(text)//1900+1):
+            if not text:
+                break
+            await ctx.channel.send(f"```{text[:1900]}```")
+            text = text[1900:]
+    else:
+        await ctx.channel.send(f"```{text}```")
 
 #@bot.command()
 #async def meme(ctx,top='',middle='',bottom=''):
@@ -122,20 +165,9 @@ async def say(ctx):
     await ctx.message.delete()
 
 @bot.command()
-async def bigemoji(ctx,Name):
-    print(ctx.__dict__)
-    emojis = await ctx.guild.fetch_emojis()
-    content = Name.lstrip('<')
-    name = content.split(':')[1]
-    factor = float(content.split('>')[1].strip()) if content.split('>')[1] != '' else 2
-    if factor > 5:
-        await ctx.message.delete()
-        await ctx.send("```Le facteur max est 5 (c'est pour toi seb)```")
-        return
-    for emoji in emojis:
-        if name == emoji.name:
-            url = emoji.url
-            break
+async def bigemoji(ctx,emoji: discord.PartialEmoji):
+    url = emoji.url
+    factor = 5
     async with ctx.typing():
         await url.save('Temp/' + emoji.name + '.png')
         path = 'Temp/' + emoji.name + '.png'

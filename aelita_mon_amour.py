@@ -22,9 +22,13 @@ async def get_guilds():
 @bot.event
 async def on_ready():
     print("Hi Elvin i'm here")
-    print(os.system('chdir'))
     global talk
     talk = Talk(bot)
+
+
+@bot.event
+async def on_member_join(member):
+    await member.edit(nick = f"Muffin {member.display_name}")
 
 @bot.listen('on_message')
 async def process(message):
@@ -60,7 +64,6 @@ async def disconnect(ctx):
 async def on_reaction_add(reaction,user):
     if user == bot.user:
         return
-
     if reaction.emoji in number_list or reaction.emoji == "✅":
         for game in Games:
             if reaction.message == game.message[-1]:
@@ -69,6 +72,14 @@ async def on_reaction_add(reaction,user):
                 else:
                     await tictactoe.PlaceT(reaction,user)
                 await reaction.remove(user)
+
+@bot.event
+async def on_raw_reaction_add(payload):
+    if payload.user_id == bot.user.id:
+        return
+    if payload.emoji.name == '🎉':
+        print('yay')
+    print(repr(payload.emoji.name))
 
 @bot.command()
 async def load(ctx,*args):
@@ -89,7 +100,7 @@ async def load(ctx,*args):
 
 #id hugo = 530726932216807437
 #-------------------- ‼️
-#with open('Id/id.txt','r') as IdFile:
-#    token = IdFile.read()
-token = os.getenv("BOT_TOKEN")
+with open('Id/id.txt','r') as IdFile:
+    token = IdFile.read()
+#token = os.getenv("BOT_TOKEN")
 bot.run(token)
